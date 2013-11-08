@@ -61,6 +61,12 @@ function minifyJS($_src) {
 					$_str=strstr(substr($_src,$_ptr+2),"\n",TRUE);
 					$_ptr+=strlen($_str)+2;
 				}
+				else if (($_src[$_ptr] == ' ') && (($_src[$_ptr + 1] == '-') || ($_src[$_ptr + 1] == '.') || ($_src[$_ptr + 1] == '#'))) {
+					// fix "Npx -Npx" cases (space followed by -)
+					// fix "#boo .bla" cases (space followed by .)
+					echo $_src[$_ptr];
+					$_ptr++;
+				}
 				else {
 					// Division operator
 					echo $_src[$_ptr];

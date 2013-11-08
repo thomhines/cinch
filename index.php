@@ -1,5 +1,18 @@
 <?php
 
+/*----------------------------------------------------------------------*
+
+	Cinch
+	https://github.com/thomhines/cinch
+	
+	A simple, streamlined plugin to minimize and cache JS/CSS files
+
+	Copyright 2013, Thom Hines
+	MIT License
+	
+*----------------------------------------------------------------------*/
+
+
 include('minify.php');
 
 // GZIP CONTENT WHEN AVAILABLE
@@ -8,7 +21,7 @@ else ob_start();
 
 
 // DELETE CACHE FILES IF CLEARCACHE IS TRUE
-if(isset($_GET['clearcache']) && $_GET['clearcache'] == true) {
+if(isset($_GET['clearcache']) && $_GET['clearcache'] === true) {
 	$files = glob('cache/*.*s'); // select all .js and .css files
 	foreach($files as $file){
 	  if(is_file($file)) unlink($file);
@@ -54,7 +67,8 @@ if($new_changes || $_GET['force']) {
 
 	$content = '';
 	foreach($file_array as $file) { // combine files
-		if($_GET['min'] || !isset($_GET['min'])) $compress_file = true;
+		
+		if($_GET['min'] === true || !isset($_GET['min'])) $compress_file = true;
 		else $compress_file = false;
 		if(substr($file,0,1) == "!") {
 			$compress_file = false;
@@ -67,6 +81,20 @@ if($new_changes || $_GET['force']) {
 			if(!$temp_content = fread($handle, filesize($path.$file))) $error .= "There was an error trying to open '".$file."'.\n";
 			
 			else {
+			
+				// IF .SCSS, PROCESS AND CONVERT TO CSS
+				if(substr($file, -5) == '.scss') {
+					require_once('scss.inc.php');
+					$scss = new scssc();
+					$temp_content = $scss->compile($temp_content);
+				}
+				
+				// IF .LESS, PROCESS AND CONVERT TO CSS
+				if(substr($file, -5) == '.less') {
+					require_once('lessc.inc.php');
+					$less = new lessc();
+					$temp_content = $less->compile($temp_content);
+				}
 
 				if($compress_file && $_GET['t']=='js') $temp_content = minifyJS($temp_content);
 				elseif($compress_file) $temp_content = minifyCSS($temp_content, $path);
@@ -78,8 +106,7 @@ if($new_changes || $_GET['force']) {
 		}
 	}
 	
-	// IF .SCSS, PROCESS AND CONVERT TO CSS
-	// COMING SOON!
+
 	
 	
 	// OUTPUT FILE
@@ -108,7 +135,6 @@ header('Cache-Control: public');
 
 // IF THERE IS A NEW CACHE FILE, SEND NEW CONTENT
 if($new_changes || $_GET['force']) {
-	echo '/* new changes */\n\n';
 	if($_GET['debug'] && isset($error)) echo "/*\n\nERROR:\n$error \n*/\n\n";
 	echo $content;
 }
@@ -128,7 +154,6 @@ else {
 		echo "ERROR: There was an error trying to open '".$cachefile."'.\n";
 		exit;
 	}
-	echo '/* load cache */\n\n';
 	$content = fread($handle, filesize($cachefile));
 	fclose($handle);
 	

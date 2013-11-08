@@ -1,7 +1,7 @@
 Cinch
 =====
 
-Simple, streamlined plugin to minimize and cache JS/CSS files.
+A simple, streamlined plugin to minimize and cache JS/CSS files.
 
 
 
@@ -27,7 +27,7 @@ Furthermore, it's perfect for both development and production environments. Cinc
 Basic usage
 -----------
 
-Just replace any `<script>` or `<link>` tags in your HTML with the appropriate tag below, and then add the JS/CSS files and any desired options to the query URL.
+Just upload the 'cinch' folder to **the root folder of your site**, and replace all of your `<script>` or `<link>` tags in your HTML with just one tag that links to all of your JS/CSS files. 
 
 Javascript:
 
@@ -61,7 +61,7 @@ In order to use any of the options below, simply add them to the query string in
 
 - **files=(comma separated list of files)** - List of JS or CSS files to include
 
-	- NOTE: Files should contain relative path from site root to the files being listed (eg. /js/scripts.js) .
+	- NOTE: Files should contain relative path from **site root** to the files being listed (eg. /js/scripts.js) .
 	
 	- NOTE: To prevent individual files from being minified (when including an already minified .js file, for instance), simply add '!' to the beginning of that files path in the comma separated list.
 		
@@ -84,3 +84,13 @@ In order to use any of the options below, simply add them to the query string in
 - **clearcache=(true|false*)** - Clears all cache files on the server. This option can be run independently without a files list.
 	
 - **debug=(true|false*)** - When enabled, output files display errors. Otherwise, errors are ignored.
+
+
+
+### Special Thanks
+
+Cinch is made with the help of:
+
+- [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
+
+- [scssphp](http://leafo.net/scssphp/) and [lessphp](http://leafo.net/lessphp/) by [leafo](http://leafo.net/)
