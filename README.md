@@ -8,19 +8,20 @@ A simple, streamlined plugin to minimize and cache JS/CSS files.
 Description
 -----------
 
-Cinch allows developers to automatically handle JS/CSS compression and concatenization (combining multiple files into one), reducing file sizes and page load times. It has no installation process; simply change your JS/CSS links to point to Cinch with a list of the files you want to load and it will do the rest.
+Cinch allows developers to automatically handle JS/CSS compression and concatenization (combining multiple files into one), reducing file sizes and page load times. There's virtually no installation process; simply change your JS/CSS links to point to Cinch with a list of the files you want to load and it will do the rest.
 
-Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files and if it finds them. Cinch will utilize gzip when available, 
+Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files and if it finds any, it will quickly build a static cache file and to send to your users.
 
 
 
 #### Features:
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
-- Combines multiple files into one file to reduce HTTP connections with your users
-- Caches files on server if no new changes have been detected on the server
+- Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
+- Combines multiple files into one file to reduce HTTP connections between the server and your users
+- Caches files on server if no new changes have been detected to the source files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
-- Uses gzip to further compress files when available
+- Uses gzip to further compress output files when available
 
 
 
@@ -91,6 +92,10 @@ In order to use any of the options below, simply add them to the query string in
 
 Cinch is made with the help of:
 
-- [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
+- [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at [Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
 
-- [scssphp](http://leafo.net/scssphp/) and [lessphp](http://leafo.net/lessphp/) by [leafo](http://leafo.net/)
+- [phpsass](https://github.com/richthegeek/phpsass) - SASS/SCSS Processing by richthegeek
+
+- [lessphp](http://leafo.net/lessphp/) - LESS Processing by [leafo](http://leafo.net/)
+
+- [coffeescript-php](https://github.com/alxlit/coffeescript-php) - CoffeeScript Processing by alxlit
