@@ -29,8 +29,8 @@ if(!isset($_GET['files'])) exit(); // if no files have been selected, stop here
 // PREPARE VARIABLES
 $file_array = explode(',', $_GET['files']); 
 $cachefile = 'cache/'.md5(implode(",", $_GET)); // build cache filename based on current parameters
-$path = $_SERVER['SCRIPT_FILENAME']; // set path to site root folder
-$path = str_replace('cinch/index.php', '', $path); // remove reference to cinch folder
+$filepath = $_SERVER['SCRIPT_FILENAME']; // set path to site root folder
+$filepath = str_replace('cinch/index.php', '', $filepath); // remove reference to cinch folder
 
 
 
@@ -39,6 +39,7 @@ if($_GET['t']=='auto' || !isset($_GET['t'])) { // auto detect content type
 	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee') $_GET['t'] = 'js';
 	else $_GET['t'] = 'css';
 } 
+
 if($_GET['t']=='js') { // JS
 	header("Content-type: application/x-javascript; charset: UTF-8"); 
 	$cachefile .= '.js';
@@ -55,7 +56,7 @@ else $timestamp = 0;
 $new_changes = false;
 foreach($file_array as $file) {
 	if(substr($file,0,1) == "!") $file = substr($file,1); ; // remove '!'
-	if(is_file($path.$file)) if(filemtime($path.$file) > $timestamp) $new_changes = true;
+	if(is_file($filepath.$file)) if(filemtime($filepath.$file) > $timestamp) $new_changes = true;
 }
 
 
@@ -75,12 +76,13 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			$compress_file = false;
 			if(substr($file,0,1) == "!") $file = substr($file,1); // remove '!' from the front of filename
 		}
-		if(!is_file($path.$file)) $error .= "'".$file."' is not a valid file.\n";
+		if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
 		else {
-			if(!$handle = fopen($path.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
+			if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
 			$temp_content = "";
-			if(!$temp_content = fread($handle, filesize($path.$file))) $error .= "There was an error trying to open '".$file."'.\n";
+			if(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
 			
+			// NO ERRORS, LOAD FILE
 			else {
 			
 				// IF .SCSS, PROCESS AND CONVERT TO CSS
@@ -91,13 +93,19 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 				
 				// IF .LESS, PROCESS AND CONVERT TO CSS
 				if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content);
-				
+
 				// IF CoffeeScript, PROCESS AND CONVERT TO JS
 				if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
-				
+
 				// MINIFY CONTENT
 				if($compress_file && $_GET['t']=='js') $temp_content = minifyJS($temp_content);
-				elseif($compress_file) $temp_content = minifyCSS($temp_content, $path);
+				elseif($compress_file) $temp_content = minifyCSS($temp_content);
+
+				// FIX LINKS TO EXTERNAL FILES IN CSS
+				if($_GET['t'] == 'css') {
+					$path = "../".dirname($file)."/"; // trailing slash just in case user didn't add a leading slash to their CSS file path
+					$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
+				}
 				
 				if($_GET['debug']) $temp_content = "/* $file */\n".$temp_content;
 				$content .= $temp_content."\n\n";
