@@ -18,6 +18,7 @@ Furthermore, it's perfect for both development and production environments. Cinc
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
 - Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
+- Built-in access to all libraries in the [Google Hosted Libraries](https://developers.google.com/speed/libraries/)
 - Combines multiple files into one file to reduce HTTP connections between the server and your users
 - Caches files on server if no new changes have been detected to the source files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
@@ -43,13 +44,13 @@ CSS:
 
 ### Examples
 
-The following example will load up three javascript files (/js/jquery.js, /js/functions.js, /js/ajax.js) and disable minification.
+The following example will load up three javascript files (jQuery from Google Hosted Libraries, /js/functions.js, /js/ajax.js) and disable minification.
 
-	<script type="text/javascript" src="/cinch/?files=/js/jquery.js,/js/functions.js,/js/ajax.js&min=false"></script>
+	<script type="text/javascript" src="[jquery/1.10.2],/js/functions.js,/js/ajax.js&min=false"></script>
 	
-The next example will load up three CSS files (css/reset.css, css/layout.css, css/text.css), disable minification for reset.css (by adding the '!' to the file path for that file), and will force Cinch to create a new 
+The next example will load up three CSS files (css/reset.css, css/layout.css, css/text.css), disable minification for reset.css (by adding the '!' to the file path for that file), and will force Cinch to create a new cache file on the server every time the page is reloaded.
 	
-	<link type="text/css" media="all" href="/cinch/?&files=!css/reset.css,css/layout.css,css/text.css&force=true">
+	<link type="text/css" media="all" href="/cinch/?&files=!/css/reset.css,/css/layout.css,/css/text.css&force=true">
 
 
 
@@ -62,13 +63,22 @@ In order to use any of the options below, simply add them to the query string in
 
 - **files=(comma separated list of files)** - List of JS or CSS files to include
 
-	- NOTE: Files should contain relative path from **site root** to the files being listed (eg. /js/scripts.js) .
-	
-	- NOTE: To prevent individual files from being minified (when including an already minified .js file, for instance), simply add '!' to the beginning of that files path in the comma separated list.
-		
-		For example, `/cinch/?files=!/js/jquery.min.js`
+*NOTE*: Files should contain relative path from **site root** to the files being listed (eg. `/js/scripts.js`) .	
 
-#### OPTIONAL
+##### OPTIONS
+- **'!'** - To disable minification on individual files, simply add '!' to the beginning of that file's path in the comma separated list. 
+
+	Example: `?files=!/js/plugin.min.js,!/js/scripts.js`
+
+- **[library-name/version]** - To include a library from Google's Hosted Library selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). 
+
+	Example: `?files=[jquery/1.10.2]`
+
+	Available libraries are: 'angularjs', 'chrome-frame', 'dojo', 'ext-core', 'jquery', 'jqueryui', 'mootools', 'prototype', 'scriptaculous', 'swfobject', and 'webfont'. Check [Google's Developer Guide](https://developers.google.com/speed/libraries/devguide) for more information on what versions are available.
+	
+
+
+#### OPTIONAL SETTINGS
 *Values marked with a star are the default and will be used if no value is given.*
 		
 - **t=(js|css|auto*)** - Indicate which type of files are being sent to Cinch
@@ -86,6 +96,13 @@ In order to use any of the options below, simply add them to the query string in
 	
 - **debug=(true|false*)** - When enabled, output files display errors. Otherwise, errors are ignored.
 
+
+### Requirements
+
+- **PHP 4.3+** - Core functionality (minification and concatenization)  
+- **PHP 5.1?** - Sass/SCSS Compiler (Just a guess as to which version is necessary)
+- **PHP 5.1+** - LESS Compiler
+- **PHP 5.3+** - CoffeeScript Compiler
 
 
 ### Special Thanks

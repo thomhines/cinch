@@ -36,7 +36,7 @@ $filepath = str_replace('cinch/index.php', '', $filepath); // remove reference t
 
 // USE CORRECT CONTENT TYPE 
 if($_GET['t']=='auto' || !isset($_GET['t'])) { // auto detect content type
-	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee') $_GET['t'] = 'js';
+	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee' || substr($file_array[0], 0, 1) == '[') $_GET['t'] = 'js';
 	else $_GET['t'] = 'css';
 } 
 
@@ -67,52 +67,88 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 	$content = '';
 	foreach($file_array as $file) { // combine files
 		
+		// MINIFY FILES
 		if($_GET['min'] === true || !isset($_GET['min'])) {
 			$compress_file = true;
 			require_once('processors/minify.php');
 		}
 		else $compress_file = false;
-		if(substr($file,0,1) == "!") {
+		
+		if(substr($file,0,1) == "!") { // don't minify file if marked with an '!'
 			$compress_file = false;
 			if(substr($file,0,1) == "!") $file = substr($file,1); // remove '!' from the front of filename
 		}
-		if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
-		else {
-			if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
-			$temp_content = "";
-			if(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
+		
+		
+		// LOAD AND READ FILE
+		
+		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM GOOGLE HOSTED LIBRARIES
+			$compress_file = false;
+			$file = preg_replace("/[\[\]\s]/", "", $file); // remove brackets and spaces
+			$library_array = explode('/', $file); 
 			
-			// NO ERRORS, LOAD FILE
+			$google_filenames = array(
+				'angularjs' => 'angular.min.js',
+				'chrome-frame' => 'CFInstall.min.js',
+				'dojo' => 'dojo/dojo.js',
+				'ext-core' => 'ext-core.js',
+				'jquery' => 'jquery.min.js',
+				'jqueryui' => 'jquery-ui.min.js',
+				'mootools' => 'mootools-yui-compressed.js',
+				'prototype' => 'prototype.js',
+				'scriptaculous' => 'scriptaculous.js',
+				'swfobject' => 'swfobject.js',
+				'webfont' => 'webfont.js',
+			);
+			
+			
+			$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
+			if(!$temp_content = @file_get_contents($library_file))  $error .= "'".$file."' is not a valid Google Library file.\n";
+		} 
+		
+		
+		else { // LOAD A LOCAL FILE
+			if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
 			else {
-			
-				// IF .SCSS, PROCESS AND CONVERT TO CSS
-				if(substr($file, -5) == '.scss') $temp_content = convertSCSS($temp_content);
-				
-				// IF .SASS, PROCESS AND CONVERT TO CSS
-				if(substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content);
-				
-				// IF .LESS, PROCESS AND CONVERT TO CSS
-				if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content);
-
-				// IF CoffeeScript, PROCESS AND CONVERT TO JS
-				if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
-
-				// MINIFY CONTENT
-				if($compress_file && $_GET['t']=='js') $temp_content = minifyJS($temp_content);
-				elseif($compress_file) $temp_content = minifyCSS($temp_content);
-
-				// FIX LINKS TO EXTERNAL FILES IN CSS
-				if($_GET['t'] == 'css') {
-					$path = "../".dirname($file)."/"; // trailing slash just in case user didn't add a leading slash to their CSS file path
-					$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
+				if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
+				else {
+					$temp_content = "";
+					if(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
+					fclose($handle);
 				}
-				
-				if($_GET['debug']) $temp_content = "/* $file */\n".$temp_content;
-				$content .= $temp_content."\n\n";
-			}			
-			fclose($handle);
-			
+			}
 		}
+		
+		
+		
+		// NO ERRORS, LOAD FILE
+		if($temp_content) {
+			
+			// IF .SCSS, PROCESS AND CONVERT TO CSS
+			if(substr($file, -5) == '.scss') $temp_content = convertSCSS($temp_content);
+			
+			// IF .SASS, PROCESS AND CONVERT TO CSS
+			if(substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content);
+			
+			// IF .LESS, PROCESS AND CONVERT TO CSS
+			if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content);
+
+			// IF CoffeeScript, PROCESS AND CONVERT TO JS
+			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
+
+			// MINIFY CONTENT
+			if($compress_file && $_GET['t']=='js') $temp_content = minifyJS($temp_content);
+			elseif($compress_file) $temp_content = minifyCSS($temp_content);
+
+			// FIX LINKS TO EXTERNAL FILES IN CSS
+			if($_GET['t'] == 'css') {
+				$path = "../".dirname($file)."/"; // trailing slash just in case user didn't add a leading slash to their CSS file path
+				$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
+			}
+			
+			if($_GET['debug']) $temp_content = "/* $file */\n".$temp_content;
+			$content .= $temp_content."\n\n";
+		}			
 	}	
 	
 	// OUTPUT FILE
