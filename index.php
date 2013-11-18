@@ -84,6 +84,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		
 		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM GOOGLE HOSTED LIBRARIES
 			$compress_file = false;
+			$temp_content = getGoogleLibrary($file);
+/*
 			$file = preg_replace("/[\[\]\s]/", "", $file); // remove brackets and spaces
 			$library_array = explode('/', $file); 
 			
@@ -103,7 +105,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			
 			
 			$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
-			if(!$temp_content = @file_get_contents($library_file))  $error .= "'".$file."' is not a valid Google Library file.\n";
+*/
+			if(!$temp_content) $error .= "'".$file."' is not a valid Google Library file.\n";
 		} 
 		
 		
@@ -124,16 +127,13 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		// NO ERRORS, LOAD FILE
 		if($temp_content) {
 			
-			// IF .SCSS, PROCESS AND CONVERT TO CSS
-			if(substr($file, -5) == '.scss') $temp_content = convertSCSS($temp_content);
+			// IF SASS, PROCESS AND CONVERT TO CSS
+			if(substr($file, -5) == '.scss' || substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content);
 			
-			// IF .SASS, PROCESS AND CONVERT TO CSS
-			if(substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content);
-			
-			// IF .LESS, PROCESS AND CONVERT TO CSS
+			// IF LESS, PROCESS AND CONVERT TO CSS
 			if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content);
 
-			// IF CoffeeScript, PROCESS AND CONVERT TO JS
+			// IF COFFEESCRIPT, PROCESS AND CONVERT TO JS
 			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
 
 			// MINIFY CONTENT
@@ -209,12 +209,10 @@ else {
 
 
 /*----------------------------------------------------------------------*
-
-	FUNCTIONS
-
+	SUPPORT FUNCTIONS
 *----------------------------------------------------------------------*/
 
-
+// DELETES ALL CACHE FILES
 function clearCache() {
 	$files = glob('cache/*.*s'); // select all .js and .css files
 	foreach($files as $file){
@@ -222,43 +220,59 @@ function clearCache() {
 	}
 }
 
-
+// PARSES SASS/SCSS
 function convertSASS($src) {
-	require_once('processors/sass-scss/SassParser.php');
-	$options = array(
-		'cache' => FALSE,
-		'syntax' => 'sass',
-		'debug' => FALSE,
-	);
-	// Execute the compiler.
-	$sass = new SassParser($options);
-	return $sass->toCss($src);
+	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
+	if(strpos($src, "{") === false) {
+		// IF SO, CONVERT IT TO SCSS
+		require_once('processors/sass.php');
+		$src = sassToScss($src);
+	} 
+	
+	require_once('processors/scss/scss.inc.php');
+	$scss = new scssc();
+	return $scss->compile($src);
 }
 
-function convertSCSS($src) {
-	require_once('processors/sass-scss/SassParser.php');
-	$options = array(
-		'cache' => FALSE,
-		'syntax' => 'scss',
-		'debug' => FALSE,
-	);
-	// Execute the compiler.
-	$scss = new SassParser($options);
-	return $scss->toCss($src);
-}
-
+// PARSES LESS
 function convertLESS($src) {
 	require_once('processors/less/lessc.inc.php');
 	$less = new lessc();
 	return $less->compile($src);
 }
 
+// PARSES COFFEESCRIPT
 function convertCoffee($src) {	
 	require_once('processors/coffeescript/Init.php');
 	CoffeeScript\Init::load();
 	return CoffeeScript\Compiler::compile($src);
 }
 
+
+// RETRIEVE LIBRARY FILE FROM GOOGLE HOSTED LIBRARIES
+function getGoogleLibrary($library) {
+	$library = preg_replace("/[\[\]\s]/", "", $library); // remove brackets and spaces
+	$library_array = explode('/', $library); 
+	
+	$google_filenames = array(
+		'angularjs' => 'angular.min.js',
+		'chrome-frame' => 'CFInstall.min.js',
+		'dojo' => 'dojo/dojo.js',
+		'ext-core' => 'ext-core.js',
+		'jquery' => 'jquery.min.js',
+		'jqueryui' => 'jquery-ui.min.js',
+		'mootools' => 'mootools-yui-compressed.js',
+		'prototype' => 'prototype.js',
+		'scriptaculous' => 'scriptaculous.js',
+		'swfobject' => 'swfobject.js',
+		'webfont' => 'webfont.js',
+	);
+	
+	
+	$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
+	
+	return @file_get_contents($library_file);
+}
 
 
 ?>

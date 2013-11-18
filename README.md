@@ -46,17 +46,17 @@ CSS:
 
 The following example will load up three javascript files (jQuery from Google Hosted Libraries, /js/functions.js, /js/ajax.js) and disable minification.
 
-	<script type="text/javascript" src="[jquery/1.10.2],/js/functions.js,/js/ajax.js&min=false"></script>
+	<script type="text/javascript" src="/cinch/?files=[jquery/1.10.2],/js/functions.js,/js/ajax.js&min=false"></script>
 	
 The next example will load up three CSS files (css/reset.css, css/layout.css, css/text.css), disable minification for reset.css (by adding the '!' to the file path for that file), and will force Cinch to create a new cache file on the server every time the page is reloaded.
 	
-	<link type="text/css" media="all" href="/cinch/?&files=!/css/reset.css,/css/layout.css,/css/text.css&force=true">
+	<link type="text/css" media="all" href="/cinch/?files=!/css/reset.css,/css/layout.css,/css/text.css&force=true">
 
 
 
-### Options
+### Settings
 
-In order to use any of the options below, simply add them to the query string in the `<script>` or `<link>` tag, separated by the '&' character.
+In order to use any of the setting below, just add them to the query string in the `<script>` or `<link>` tag, separated by the '&' character.
 
 
 #### REQUIRED
@@ -84,9 +84,9 @@ In order to use any of the options below, simply add them to the query string in
 - **t=(js|css|auto*)** - Indicate which type of files are being sent to Cinch
 	- **js**: Process files as javascript
 	- **css**: Process files as CSS
-	- **auto***: Cinch will do it's best to automatically detect which type of files are being used. This is based on the extension of the first file in the list
+	- **auto***: Cinch will do it's best to automatically detect which type of files are being used. This is based on the extension of the first file in the list.
 	
-- **force=(true|false*)** - Force Cinch to rebuild the cache and update the user's browser with the newest code on every page load
+- **force=(true|false*)** - Force Cinch to rebuild the cache and update the user's browser with the newest code on every page load, even if no changes have been detected.
 
 - **min=(true*|false)** - Enable/disable minification on files. 
 	- NOTE: Files will still be concatenated and cached.
@@ -111,8 +111,6 @@ Cinch is made with the help of:
 
 - [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at [Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
 
-- [phpsass](https://github.com/richthegeek/phpsass) - SASS/SCSS Processing by richthegeek
-
-- [lessphp](http://leafo.net/lessphp/) - LESS Processing by [leafo](http://leafo.net/)
+- [lessphp](http://leafo.net/lessphp/)/[scssphp](http://leafo.net/scssphp/) - LESS/SCSS Processing by [leafo](http://leafo.net/)
 
 - [coffeescript-php](https://github.com/alxlit/coffeescript-php) - CoffeeScript Processing by alxlit
