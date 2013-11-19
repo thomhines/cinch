@@ -128,10 +128,10 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		if($temp_content) {
 			
 			// IF SASS, PROCESS AND CONVERT TO CSS
-			if(substr($file, -5) == '.scss' || substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content);
+			if(substr($file, -5) == '.scss' || substr($file, -5) == '.sass') $temp_content = convertSASS($temp_content, $file);
 			
 			// IF LESS, PROCESS AND CONVERT TO CSS
-			if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content);
+			if(substr($file, -5) == '.less') $temp_content = convertLESS($temp_content, $file);
 
 			// IF COFFEESCRIPT, PROCESS AND CONVERT TO JS
 			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
@@ -146,8 +146,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 				$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
 			}
 			
-			if($_GET['debug']) $temp_content = "/* $file */\n".$temp_content;
-			$content .= $temp_content."\n\n";
+			if($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content;
+			if($temp_content) $content .= $temp_content."\n\n";
 		}			
 	}	
 	
@@ -194,13 +194,13 @@ elseif ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '',
 // OTHERWISE, LOAD CACHED FILE AND SEND TO USER
 else {
 	if(!$handle = fopen($cachefile, "r")) {
-		echo "ERROR: There was an error trying to open '".$cachefile."'.\n";
+		echo "/*\nERROR: There was an error trying to open '".$cachefile."'.\n*/\n\n";
 		exit;
 	}
 	$content = fread($handle, filesize($cachefile));
 	fclose($handle);
 	
-	if($_GET['debug'] && isset($error)) echo "/*\n\nERROR:\n$error \n*/\n\n";
+	if($_GET['debug'] && isset($error)) echo "/*\nERROR:\n$error \n*/\n\n";
 	echo $content;	
 }
 
@@ -212,16 +212,10 @@ else {
 	SUPPORT FUNCTIONS
 *----------------------------------------------------------------------*/
 
-// DELETES ALL CACHE FILES
-function clearCache() {
-	$files = glob('cache/*.*s'); // select all .js and .css files
-	foreach($files as $file){
-		if(is_file($file)) unlink($file);
-	}
-}
-
 // PARSES SASS/SCSS
-function convertSASS($src) {
+function convertSASS($src, $file) {
+	
+	$path = "../".dirname($file)."/";
 	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
 	if(strpos($src, "{") === false) {
 		// IF SO, CONVERT IT TO SCSS
@@ -231,14 +225,28 @@ function convertSASS($src) {
 	
 	require_once('processors/scss/scss.inc.php');
 	$scss = new scssc();
-	return $scss->compile($src);
+	$scss->addImportPath($path);
+	try {
+		$css = $scss->compile($src);	
+	} catch(Exception $e) {
+		if($_GET['debug']) echo "/*\nERROR: $file\n" . $e->getMessage() . " \n*/\n\n";
+	}
+	return $css;
 }
 
 // PARSES LESS
-function convertLESS($src) {
+function convertLESS($src, $file) {
+	
+	$path = "../".dirname($file)."/";
 	require_once('processors/less/lessc.inc.php');
 	$less = new lessc();
-	return $less->compile($src);
+	$less->addImportDir($path);
+	try {
+		$css = $less->compile($src);	
+	} catch(Exception $e) {
+		if($_GET['debug']) echo "/*\nERROR: $file\n" . $e->getMessage() . " \n*/\n\n";
+	}
+	return $css;
 }
 
 // PARSES COFFEESCRIPT
@@ -274,5 +282,13 @@ function getGoogleLibrary($library) {
 	return @file_get_contents($library_file);
 }
 
+
+// DELETES ALL CACHE FILES
+function clearCache() {
+	$files = glob('cache/*.*s'); // select all .js and .css files
+	foreach($files as $file){
+		if(is_file($file)) unlink($file);
+	}
+}
 
 ?>

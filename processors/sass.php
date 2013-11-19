@@ -17,7 +17,8 @@ function sassToScss($src) {
 	// REPLACE SASS ELEMENTS WITH SCSS EQUIVALENTS
 	$sass = preg_replace("/[ ]{2}/", "	", $sass); // convert spaces to tabs
 	$sass = preg_replace("/([\s]):([\S]*)/i", "$1$2:", $sass); // change :property style rules to standard order
-	$sass = preg_replace("/([^&]:[^\r\n]+)[\s]*(\r\n|\n|\r)/", "$1;$2", $sass);; // add a ";" to all lines that are rules
+	$sass = preg_replace("/([^&]:[^\r\n]+)[\s]*(\r\n|\n|\r)/", "$1;$2", $sass); // add a ";" to all lines that are rules
+	$sass = preg_replace('/@import "?([^\r\n"]*)"?/', '@import "$1";', $sass); // add a ";" to all lines that are import rules
 	$sass = preg_replace("/,[\s]*[\r\n|\n|\r]/", ", ", $sass); // remove any linebreaks after a comma
 	$sass = preg_replace("/=/", "@mixin ", $sass); // convert "=" to "@mixin "
 	$sass = preg_replace("/\+([^\s]*)/", "@include $1;", $sass); // convert "+" to "@include "
