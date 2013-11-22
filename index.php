@@ -19,6 +19,7 @@ else ob_start();
 
 
 // DELETE CACHE FILES IF CLEARCACHE IS TRUE
+// TO DISABLE REMOTE CLEARING, JUST DELETE/COMMENT THE LINE BELOW
 if($_GET['clearcache']) clearCache();
 
 

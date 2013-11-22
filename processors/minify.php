@@ -104,7 +104,7 @@ function minifyJS($_src) {
 
 function minifyCSS($_src) {
 	$_out = preg_replace("/\s+/", " ", $_src); // remove excess spaces
-	$_out = preg_replace("/\s?(;|{|})\s?/", "$1", $_out); // remove spaces next to CSS specific characters (ie. ;, {, })
+	$_out = preg_replace("/\s?(,|;|:|{|})\s?/", "$1", $_out); // remove spaces next to CSS specific characters (ie. ;, {, })
 	$_out = preg_replace("/\/\*(.|[\r\n])*?\*\//", "", $_out); // remove comments	
 	$_out = trim($_out);
 	
