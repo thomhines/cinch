@@ -1,0 +1,20 @@
+@import "scss-import.scss";
+
+@mixin success_mixin {
+	display: block;
+}
+	
+
+@mixin fail_mixin {
+	display: none;
+}
+
+
+
+.scss.success {
+	@include success_mixin;
+}
+
+.scss.fail {
+	@include fail_mixin;
+}
