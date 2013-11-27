@@ -1,5 +1,5 @@
-Cinch
-=====
+Cinch 0.4
+=========
 
 A simple, streamlined plugin to minimize and cache JS/CSS files.
 
@@ -31,18 +31,18 @@ Basic usage
 
 Just upload the 'cinch' folder to **the root folder of your site**, and replace all of your `<script>` or `<link>` tags in your HTML with just one tag that links to all of your JS/CSS files. 
 
-Javascript:
+### Example 
 
-	<script type="text/javascript" src="/cinch/?[**OPTIONS**]"></script>
+	<script src="/js/jquery.min.js" type="text/javascript"></script>
+	<script src="/js/functions.js" type="text/javascript"></script>
+	<script src="/js/scripts.js" type="text/javascript"></script>
+	
+turns into:
 
+	<script src="/cinch/?files=/js/jquery.min.js,/js/functions.js,/js/scripts.js" type="text/javascript"></script>
 
-CSS: 
+#### More Examples
 
-	<link type="text/css" href="/cinch/?[**OPTIONS**]">
-
-
-
-### Examples
 
 The following example will load up three javascript files (jQuery from Google Hosted Libraries, /js/functions.js, /js/ajax.js) and disable minification.
 
@@ -56,7 +56,7 @@ The next example will load up three CSS files (css/reset.css, css/layout.css, cs
 
 ### Settings
 
-In order to use any of the setting below, just add them to the query string in the `<script>` or `<link>` tag, separated by the '&' character.
+In order to use any of the setting below, just add them to the query string in the `<script>` or `<link>` tag, separated by the '&' character. All settings work for both JS and CSS type files. 
 
 
 #### REQUIRED
@@ -66,11 +66,11 @@ In order to use any of the setting below, just add them to the query string in t
 *NOTE*: Files should contain relative path from **site root** to the files being listed (eg. `/js/scripts.js`) .	
 
 ##### OPTIONS
-- **'!'** - To disable minification on individual files, simply add '!' to the beginning of that file's path in the comma separated list. 
+- **!(/path/to/filename)** - To disable minification on individual files, simply add '!' to the beginning of that file's path in the comma separated list. 
 
 	Example: `?files=!/js/plugin.min.js,!/js/scripts.js`
 
-- **[library-name/version]** - To include a library from Google's Hosted Library selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). 
+- **[library-name/version]** - To include a library from [Google Hosted Libraries](https://developers.google.com/speed/libraries/) selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). 
 
 	Example: `?files=[jquery/1.10.2]`
 
