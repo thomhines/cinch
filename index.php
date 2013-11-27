@@ -86,7 +86,6 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM GOOGLE HOSTED LIBRARIES
 			$compress_file = false;
 			$temp_content = getGoogleLibrary($file);
-/*
 			$file = preg_replace("/[\[\]\s]/", "", $file); // remove brackets and spaces
 			$library_array = explode('/', $file); 
 			
@@ -106,7 +105,6 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			
 			
 			$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
-*/
 			if(!$temp_content) $error .= "'".$file."' is not a valid Google Library file.\n";
 		} 
 		
@@ -117,7 +115,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 				if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
 				else {
 					$temp_content = "";
-					if(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
+					if(filesize($filepath.$file) == 0) $error .= "'".$file."' is an empty file.\n";
+					elseif(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
 					fclose($handle);
 				}
 			}
@@ -147,8 +146,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 				$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
 			}
 			
-			if($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content;
-			if($temp_content) $content .= $temp_content."\n\n";
+			if($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content."\n\n";
+			if($temp_content) $content .= $temp_content;
 		}			
 	}	
 	
