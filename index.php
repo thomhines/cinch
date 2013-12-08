@@ -17,14 +17,7 @@ if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) ob_start("ob_gzhandl
 else ob_start(); 
 
 
-
-// DELETE CACHE FILES IF CLEARCACHE IS TRUE
-// TO DISABLE REMOTE CLEARING, JUST DELETE/COMMENT THE LINE BELOW
-if($_GET['clearcache']) clearCache();
-
-
 if(!isset($_GET['files'])) exit(); // if no files have been selected, stop here
-
 
 
 // PREPARE VARIABLES
@@ -41,7 +34,7 @@ if($_GET['t']=='auto' || !isset($_GET['t'])) { // auto detect content type
 	else $_GET['t'] = 'css';
 } 
 
-if($_GET['t']=='js') { // JS
+elseif($_GET['t']=='js') { // JS
 	header("Content-type: application/x-javascript; charset: UTF-8"); 
 	$cachefile .= '.js';
 }
@@ -51,15 +44,24 @@ else { // otherwise, assume CSS
 }
 
 
-// CHECK TO SEE IF CACHE IS OLDER THAN ALL OF THE FILES
 if(file_exists($cachefile)) $timestamp = filemtime($cachefile);
 else $timestamp = 0;
 $new_changes = false;
-foreach($file_array as $file) {
-	if(substr($file,0,1) == "!") $file = substr($file,1); ; // remove '!'
-	if(is_file($filepath.$file)) if(filemtime($filepath.$file) > $timestamp) $new_changes = true;
-}
 
+// CLEAR CACHE IF CACHE IS OLDER THAN ONE WEEK
+$one_week_ago = strtotime("-1 week");
+if($timestamp != 0 && $timestamp < $one_week_ago) {
+	clearCache();
+	$new_changes = true;
+} 
+
+// CHECK TO SEE IF CACHE IS OLDER THAN ALL OF THE FILES
+else {
+	foreach($file_array as $file) {
+		if(substr($file,0,1) == "!") $file = substr($file,1); // remove '!'
+		if(is_file($filepath.$file)) if(filemtime($filepath.$file) > $timestamp) $new_changes = true;
+	}
+}
 
 
 // IF NEW CHANGES HAVE BEEN DETECTED, REBUILD CACHE FILE
