@@ -1,4 +1,4 @@
-Cinch 0.4
+Cinch 0.5
 =========
 
 A simple, streamlined plugin to minimize and cache JS/CSS files.
@@ -10,7 +10,7 @@ Description
 
 Cinch allows developers to automatically handle JS/CSS compression and concatenization (combining multiple files into one), reducing file sizes and page load times. There's virtually no installation process; simply change your JS/CSS links to point to Cinch with a list of the files you want to load and it will do the rest.
 
-Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files and if it finds any, it will quickly build a static cache file and to send to your users.
+Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files, and if it finds any it will quickly build a static cache file to send to your users.
 
 
 
@@ -18,7 +18,7 @@ Furthermore, it's perfect for both development and production environments. Cinc
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
 - Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
-- Built-in access to all libraries in the [Google Hosted Libraries](https://developers.google.com/speed/libraries/)
+- Built-in access to tons of common libraries, such as jQuery, Prototype, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/) and [960.gs](http://960.gs/), and a variety of javascript plugins. See the entire list below.
 - Combines multiple files into one file to reduce HTTP connections between the server and your users
 - Caches files on server if no new changes have been detected to the source files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
@@ -70,11 +70,47 @@ In order to use any of the setting below, just add them to the query string in t
 
 	Example: `?files=!/js/plugin.min.js,!/js/scripts.js`
 
-- **[library-name/version]** - To include a library from [Google Hosted Libraries](https://developers.google.com/speed/libraries/) selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). 
+- **[library-name/version]** - To include a library from [Google Hosted Libraries](https://developers.google.com/speed/libraries/) selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). If no version is given, the latest version of the libary will be used (as of this writing).
 
-	Example: `?files=[jquery/1.10.2]`
+	Example: `?files=[jquery]` or `?files=[jquery/1.10.2]`
 
-	Available libraries are: 'angularjs', 'chrome-frame', 'dojo', 'ext-core', 'jquery', 'jqueryui', 'mootools', 'prototype', 'scriptaculous', 'swfobject', and 'webfont'. Check [Google's Developer Guide](https://developers.google.com/speed/libraries/devguide) for more information on what versions are available.
+	Available libraries are (default version is in paratheses):
+	
+	**[960gs](https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css)**, 
+**[angularjs](https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js)** (1.2.4), 
+**[chrome-frame](https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js)** (1.0.3), 
+**[dojo](https://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js)** (1.9.1), 
+**[ext-core](https://ajax.googleapis.com/ajax/libs/ext-core/3.1.0/ext-core.js)** (3.1.0), 
+**[fittext](https://raw.github.com/davatron5000/FitText.js/master/jquery.fittext.js)**, 
+**[foldy960](https://raw.github.com/davatron5000/Foldy960/master/style.css)**, 
+**[foundation-css](libraries/foundation/5.0.2/foundation.min.css)** (5.0.2), 
+**[foundation-js](libraries/foundation/5.0.2/foundation.min.js)** (5.0.2), 
+**[html5shiv](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
+**[html5shim](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
+**[isotope-css](https://raw.github.com/desandro/isotope/master/css/style.css)**, 
+**[isotope-js](https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js)**, 
+**[jquery](https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js)** (1.10.2), 
+**[jqueryui](https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js)** (1.10.3), 
+**[kube](http://imperavi.com/css/kube.css)**, 
+**[lettering](https://raw.github.com/davatron5000/Lettering.js/master/jquery.lettering.js)**, 
+**[masonry](http://masonry.desandro.com/masonry.pkgd.min.js)**, 
+**[mixitup](https://raw.github.com/barrel/mixitup/master/jquery.mixitup.min.js)**, 
+**[modernizr](http://modernizr.com/downloads/modernizr-latest.js)**, 
+**[mootools](https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js)** (1.4.5), 
+**[normalize](http://necolas.github.io/normalize.css/2.1.3/normalize.css)** (2.1.3), 
+**[prototype](https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js)** (1.7.1.0), 
+**[pure](http://yui.yahooapis.com/pure/0.3.0/pure-min.css)** (0.3.0), 
+**[reset5](http://reset5.googlecode.com/hg/reset.min.css)**, 
+**[responsiveslides-css](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.css)**, 
+**[responsiveslides-js](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js)**, 
+**[scriptaculous](https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js)** (1.9.0), 
+**[skeleton](libraries/skeleton/1.2/skeleton.css)** (1.2), 
+**[skeleton-grid](libraries/skeleton/1.2/skeleton-grid.css)** (1.2), 
+**[stellar](https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js)**, 
+**[swfobject](https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js)** (2.2), 
+**[waypoints](https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js)**, 
+**[webfont](https://ajax.googleapis.com/ajax/libs/webfont/1.5.0/webfont.js)** (1.5.0), 
+**[yui-reset](http://yui.yahooapis.com/3.14.0/build/cssreset/cssreset-min.css)** (3.14.0)
 	
 
 
@@ -91,8 +127,6 @@ In order to use any of the setting below, just add them to the query string in t
 - **min=(true*|false)** - Enable/disable minification on files. 
 	- NOTE: Files will still be concatenated and cached.
 	- NOTE: Files marked with a '!' in order to avoid minification will no be minified regardless of this setting's value.
-
-- **clearcache=(true|false*)** - Clears all cache files on the server. This option can be run independently without a files list.
 	
 - **debug=(true|false*)** - When enabled, output files display errors. Otherwise, errors are ignored.
 

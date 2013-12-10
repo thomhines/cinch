@@ -26,15 +26,60 @@ $cachefile = 'cache/'.md5(implode(",", $_GET)); // build cache filename based on
 $filepath = $_SERVER['SCRIPT_FILENAME']; // set path to site root folder
 $filepath = str_replace('cinch/index.php', '', $filepath); // remove reference to cinch folder
 
+$libraries= array( // array(library URL, default version number, css/js)
+	'960gs' => array('https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css', '', 'css'),
+	'angularjs' => array('https://ajax.googleapis.com/ajax/libs/angularjs/{version}/angular.min.js', '1.2.4', 'js'),
+	'chrome-frame' => array('https://ajax.googleapis.com/ajax/libs/chrome-frame/{version}/CFInstall.min.js', '1.0.3', 'js'),
+	'dojo' => array('https://ajax.googleapis.com/ajax/libs/dojo/{version}/dojo/dojo.js', '1.9.1', 'js'),
+	'ext-core' => array('https://ajax.googleapis.com/ajax/libs/ext-core/{version}/ext-core.js', '3.1.0', 'js'),
+	'fittext' => array('https://raw.github.com/davatron5000/FitText.js/master/jquery.fittext.js', '', 'js'),
+	'foldy960' => array('https://raw.github.com/davatron5000/Foldy960/master/style.css', '', 'css'),
+	'foundation-css' => array('libraries/foundation/{version}/foundation.min.css', '5.0.2', 'css'),
+	'foundation-js' => array('libraries/foundation/{version}/foundation.min.js', '5.0.2', 'js'),
+	'html5shiv' => array('http://html5shiv.googlecode.com/svn/trunk/html5.js', '', 'js'),
+	'html5shim' => array('http://html5shiv.googlecode.com/svn/trunk/html5.js', '', 'js'),
+	'isotope-css' => array('https://raw.github.com/desandro/isotope/master/css/style.css', '', 'css'),
+	'isotope-js' => array('https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js', '', 'js'),
+	'jquery' => array('https://ajax.googleapis.com/ajax/libs/jquery/{version}/jquery.min.js', '1.10.2', 'js'),
+	'jqueryui' => array('https://ajax.googleapis.com/ajax/libs/jqueryui/{version}/jquery-ui.min.js', '1.10.3', 'js'),
+	'kube' => array('http://imperavi.com/css/kube.css', '', 'css'),
+	'lettering' => array('https://raw.github.com/davatron5000/Lettering.js/master/jquery.lettering.js', '', 'js'),
+	'masonry' => array('http://masonry.desandro.com/masonry.pkgd.min.js', '', 'js'),
+	'mixitup' => array('https://raw.github.com/barrel/mixitup/master/jquery.mixitup.min.js', '', 'js'),
+	'modernizr' => array('http://modernizr.com/downloads/modernizr-latest.js', '', 'js'),
+	'mootools' => array('https://ajax.googleapis.com/ajax/libs/mootools/{version}/mootools-yui-compressed.js', '1.4.5', 'js'),
+	'normalize' => array('http://necolas.github.io/normalize.css/{version}/normalize.css', '2.1.3', 'css'),
+	'prototype' => array('https://ajax.googleapis.com/ajax/libs/prototype/{version}/prototype.js', '1.7.1.0', 'js'),
+	'pure' => array('http://yui.yahooapis.com/pure/{version}/pure-min.css', '0.3.0', 'css'),
+	'reset5' => array('http://reset5.googlecode.com/hg/reset.min.css', '', 'css'),
+	'responsiveslides-css' => array('https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.css', '', 'css'),
+	'responsiveslides-js' => array('https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js', '', 'jss'),
+	'scriptaculous' => array('https://ajax.googleapis.com/ajax/libs/scriptaculous/{version}/scriptaculous.js', '1.9.0', 'js'),
+	'skeleton' => array('libraries/skeleton/{version}/skeleton.css', '1.2', 'css'),
+	'skeleton-grid' => array('libraries/skeleton/{version}/skeleton-grid.css', '1.2', 'css'),
+	'stellar' => array('https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js', '', 'js'),
+	'swfobject' => array('https://ajax.googleapis.com/ajax/libs/swfobject/{version}/swfobject.js', '2.2', 'js'),
+	'waypoints' => array('https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js', '', 'js'),
+	'webfont' => array('https://ajax.googleapis.com/ajax/libs/webfont/{version}/webfont.js', '1.5.0', 'js'),
+	'yui-reset' => array('http://yui.yahooapis.com/{version}/build/cssreset/cssreset-min.css', '3.14.0', 'css'),
+);	
+
+
+
 
 
 // USE CORRECT CONTENT TYPE 
 if($_GET['t']=='auto' || !isset($_GET['t'])) { // auto detect content type
-	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee' || substr($file_array[0], 0, 1) == '[') $_GET['t'] = 'js';
+	if(substr($file_array[0], 0, 1) == '[') {
+		preg_match("/\[([^\/]*)\/?(.*)?\]/", $file_array[0], $library_array);
+		$library_info = $libraries[$library_array[1]];
+	}
+	
+	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee' || $library_info[2] == 'js') $_GET['t'] = 'js';
 	else $_GET['t'] = 'css';
 } 
 
-elseif($_GET['t']=='js') { // JS
+if($_GET['t']=='js') { // JS
 	header("Content-type: application/x-javascript; charset: UTF-8"); 
 	$cachefile .= '.js';
 }
@@ -48,9 +93,9 @@ if(file_exists($cachefile)) $timestamp = filemtime($cachefile);
 else $timestamp = 0;
 $new_changes = false;
 
-// CLEAR CACHE IF CACHE IS OLDER THAN ONE WEEK
-$one_week_ago = strtotime("-1 week");
-if($timestamp != 0 && $timestamp < $one_week_ago) {
+// CLEAR CACHE IF CACHE IS OLDER THAN ONE MONTH
+$one_month_ago = strtotime("-1 month");
+if($timestamp != 0 && $timestamp < $one_month_ago) {
 	clearCache();
 	$new_changes = true;
 } 
@@ -85,29 +130,10 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		
 		// LOAD AND READ FILE
 		
-		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM GOOGLE HOSTED LIBRARIES
+		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
 			$compress_file = false;
-			$temp_content = getGoogleLibrary($file);
-			$file = preg_replace("/[\[\]\s]/", "", $file); // remove brackets and spaces
-			$library_array = explode('/', $file); 
-			
-			$google_filenames = array(
-				'angularjs' => 'angular.min.js',
-				'chrome-frame' => 'CFInstall.min.js',
-				'dojo' => 'dojo/dojo.js',
-				'ext-core' => 'ext-core.js',
-				'jquery' => 'jquery.min.js',
-				'jqueryui' => 'jquery-ui.min.js',
-				'mootools' => 'mootools-yui-compressed.js',
-				'prototype' => 'prototype.js',
-				'scriptaculous' => 'scriptaculous.js',
-				'swfobject' => 'swfobject.js',
-				'webfont' => 'webfont.js',
-			);
-			
-			
-			$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
-			if(!$temp_content) $error .= "'".$file."' is not a valid Google Library file.\n";
+			$temp_content = loadExternalLibrary($file);
+			if(!$temp_content) $error .= "'".$file."' is not a valid library name.\n";
 		} 
 		
 		
@@ -145,7 +171,7 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			// FIX LINKS TO EXTERNAL FILES IN CSS
 			if($_GET['t'] == 'css') {
 				$path = "../".dirname($file)."/"; // trailing slash just in case user didn't add a leading slash to their CSS file path
-				$temp_content = preg_replace("/url\([']?((?!http)[^\/][^'\)]*)[']?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
+				$temp_content = preg_replace("/url\s?\(['\"]?((?!http|\/)[^'\"\)]*)['\"]?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
 			}
 			
 			if($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content."\n\n";
@@ -259,31 +285,17 @@ function convertCoffee($src) {
 }
 
 
-// RETRIEVE LIBRARY FILE FROM GOOGLE HOSTED LIBRARIES
-function getGoogleLibrary($library) {
-	$library = preg_replace("/[\[\]\s]/", "", $library); // remove brackets and spaces
-	$library_array = explode('/', $library); 
+// RETRIEVE LIBRARY FILE FROM EXTERNALLY HOSTED LIBRARIES
+function loadExternalLibrary($file) {
+	global $libraries;
 	
-	$google_filenames = array(
-		'angularjs' => 'angular.min.js',
-		'chrome-frame' => 'CFInstall.min.js',
-		'dojo' => 'dojo/dojo.js',
-		'ext-core' => 'ext-core.js',
-		'jquery' => 'jquery.min.js',
-		'jqueryui' => 'jquery-ui.min.js',
-		'mootools' => 'mootools-yui-compressed.js',
-		'prototype' => 'prototype.js',
-		'scriptaculous' => 'scriptaculous.js',
-		'swfobject' => 'swfobject.js',
-		'webfont' => 'webfont.js',
-	);
+	preg_match("/\[([^\/]*)\/?(.*)?\]/", $file, $file_array);
+	$library = $libraries[strtolower($file_array[1])];
+	$version = $file_array[2] ? $file_array[2] : $library[1];
+	$url = str_replace('{version}', $version, $library[0]);
 	
-	
-	$library_file = 'https://ajax.googleapis.com/ajax/libs/'.$library_array[0].'/'.$library_array[1].'/'.$google_filenames[$library_array[0]];
-	
-	return @file_get_contents($library_file);
+	return @file_get_contents($url);
 }
-
 
 // DELETES ALL CACHE FILES
 function clearCache() {
