@@ -16,7 +16,6 @@
 if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) ob_start("ob_gzhandler"); 
 else ob_start(); 
 
-
 if(!isset($_GET['files'])) exit(); // if no files have been selected, stop here
 
 
@@ -56,7 +55,7 @@ $libraries= array( // array(library URL, default version number, css/js)
 	'responsiveslides-css' => array('https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.css', '', 'css'),
 	'responsiveslides-js' => array('https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js', '', 'jss'),
 	'scriptaculous' => array('https://ajax.googleapis.com/ajax/libs/scriptaculous/{version}/scriptaculous.js', '1.9.0', 'js'),
-	'scrollto' => array('libraries/scrollto/{version}/jquery.scrollTo-min.js', '1.4.3.1', 'js'),
+	'scrollto' => array('libraries/scrollto/{version}/jquery.scrollTo-min.js', '1.4.3.1', 'jquery.scrollTo-min.js', 'js'),
 	'skeleton' => array('libraries/skeleton/{version}/skeleton.css', '1.2', 'css'),
 	'skeleton-grid' => array('libraries/skeleton/{version}/skeleton-grid.css', '1.2', 'css'),
 	'stellar' => array('https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js', '', 'js'),
@@ -121,7 +120,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		// MINIFY FILES
 		if($_GET['min'] === true || !isset($_GET['min'])) {
 			$compress_file = true;
-			require_once('processors/minify.php');
+			require_once('processors/css.php');
+			require_once('processors/packer-1.1/class.JavaScriptPacker.php');
 		}
 		else $compress_file = false;
 		
@@ -132,7 +132,6 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 		
 		
 		// LOAD AND READ FILE
-		
 		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
 			$compress_file = false;
 			$temp_content = loadExternalLibrary($file);
@@ -167,8 +166,11 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			// IF COFFEESCRIPT, PROCESS AND CONVERT TO JS
 			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
 
-			// MINIFY CONTENT
-			if($compress_file && $_GET['t']=='js') $temp_content = minifyJS($temp_content);
+			// MINIFY CONTENT			
+			if($compress_file && $_GET['t']=='js'){
+				$packer = new JavaScriptPacker($temp_content, 'Normal', true, false);
+				$temp_content = $packer->pack();
+			}
 			elseif($compress_file) $temp_content = minifyCSS($temp_content);
 
 			// FIX LINKS TO EXTERNAL FILES IN CSS
@@ -235,12 +237,12 @@ else {
 	echo $content;	
 }
 
-
+ob_end_flush();
 
 
 
 /*----------------------------------------------------------------------*
-	SUPPORT FUNCTIONS
+	FUNCTIONS
 *----------------------------------------------------------------------*/
 
 // PARSES SASS/SCSS
@@ -290,14 +292,32 @@ function convertCoffee($src) {
 
 // RETRIEVE LIBRARY FILE FROM EXTERNALLY HOSTED LIBRARIES
 function loadExternalLibrary($file) {
-	global $libraries;
+	global $libraries, $error;
 	
 	preg_match("/\[([^\/]*)\/?(.*)?\]/", $file, $file_array);
-	$library = $libraries[strtolower($file_array[1])];
+	$library_name = strtolower($file_array[1]);
 	$version = $file_array[2] ? $file_array[2] : $library[1];
-	$url = str_replace('{version}', $version, $library[0]);
 	
-	return @file_get_contents($url);
+	$library = $libraries[$library_name];
+	$library_url =  str_replace('{version}', $version, $library[0]);
+	$local_library_url = "libraries/$library_name/{$library[1]}/".basename($library_url);
+	
+	// IF SERVER CAN'T REMOTELY ACCESS FILES, OR NO VERSION NUMBER IS SELECTED, USE LOCAL VERSION
+	if(ini_get("allow_url_fopen") == 0 || !$file_array[2]) {
+		if(ini_get("allow_url_fopen") == 0) $error .= "Your server does not allow for access to remote libraries. A local version of $library_name was used instead.\n";
+		$library_url = $local_library_url; // reset url to local version
+	}
+	
+	// GET FILE CONTENTS	
+	$file_contents = @file_get_contents($library_url);
+	
+	// IF FILE CONTENTS FAILED TO LOAD, GET LOCAL VERSION
+	if(!$file_contents) {
+		$error .= "The external library $library_name could not be loaded. A local version was used instead.\n";
+		$file_contents = @file_get_contents($local_library_url);
+	}
+	
+	return $file_contents;
 }
 
 // DELETES ALL CACHE FILES

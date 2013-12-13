@@ -77,40 +77,40 @@ In order to use any of the setting below, just add them to the query string in t
 	Available libraries are (default version is in paratheses):
 	
 	**[960gs](https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css)**, 
-**[angularjs](https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js)** (1.2.4), 
-**[chrome-frame](https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js)** (1.0.3), 
-**[dojo](https://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js)** (1.9.1), 
-**[ext-core](https://ajax.googleapis.com/ajax/libs/ext-core/3.1.0/ext-core.js)** (3.1.0), 
-**[fittext](https://raw.github.com/davatron5000/FitText.js/master/jquery.fittext.js)**, 
-**[foldy960](https://raw.github.com/davatron5000/Foldy960/master/style.css)**, 
-**[foundation-css](http://foundation.zurb.com/)** (5.0.2), 
-**[foundation-js](http://foundation.zurb.com/)** (5.0.2), 
-**[html5shiv](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
-**[html5shim](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
-**[isotope-css](https://raw.github.com/desandro/isotope/master/css/style.css)**, 
-**[isotope-js](https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js)**, 
-**[jquery](https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js)** (1.10.2), 
-**[jqueryui](https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js)** (1.10.3), 
-**[kube](http://imperavi.com/css/kube.css)**, 
-**[lettering](https://raw.github.com/davatron5000/Lettering.js/master/jquery.lettering.js)**, 
-**[masonry](http://masonry.desandro.com/masonry.pkgd.min.js)**, 
-**[mixitup](https://raw.github.com/barrel/mixitup/master/jquery.mixitup.min.js)**, 
-**[modernizr](http://modernizr.com/downloads/modernizr-latest.js)**, 
-**[mootools](https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js)** (1.4.5), 
-**[normalize](http://necolas.github.io/normalize.css/2.1.3/normalize.css)** (2.1.3), 
-**[prototype](https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js)** (1.7.1.0), 
-**[pure](http://yui.yahooapis.com/pure/0.3.0/pure-min.css)** (0.3.0), 
-**[reset5](http://reset5.googlecode.com/hg/reset.min.css)**, 
-**[responsiveslides-css](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.css)**, 
-**[responsiveslides-js](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js)**, 
-**[scriptaculous](https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js)** (1.9.0), 
-**[skeleton](http://www.getskeleton.com/)** (1.2), 
-**[skeleton-grid](http://www.getskeleton.com/)** (1.2), 
-**[stellar](https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js)**, 
-**[swfobject](https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js)** (2.2), 
-**[waypoints](https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js)**, 
-**[webfont](https://ajax.googleapis.com/ajax/libs/webfont/1.5.0/webfont.js)** (1.5.0), 
-**[yui-reset](http://yui.yahooapis.com/3.14.0/build/cssreset/cssreset-min.css)** (3.14.0)
+	**[angularjs](https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js)** (1.2.4), 
+	**[chrome-frame](https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js)** (1.0.3), 
+	**[dojo](https://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js)** (1.9.1), 
+	**[ext-core](https://ajax.googleapis.com/ajax/libs/ext-core/3.1.0/ext-core.js)** (3.1.0), 
+	**[fittext](https://raw.github.com/davatron5000/FitText.js/master/jquery.fittext.js)**, 
+	**[foldy960](https://raw.github.com/davatron5000/Foldy960/master/style.css)**, 
+	**[foundation-css](http://foundation.zurb.com/)** (5.0.2), 
+	**[foundation-js](http://foundation.zurb.com/)** (5.0.2), 
+	**[html5shiv](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
+	**[html5shim](http://html5shiv.googlecode.com/svn/trunk/html5.js)**, 
+	**[isotope-css](https://raw.github.com/desandro/isotope/master/css/style.css)**, 
+	**[isotope-js](https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js)**, 
+	**[jquery](https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js)** (1.10.2), 
+	**[jqueryui](https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js)** (1.10.3), 
+	**[kube](http://imperavi.com/css/kube.css)**, 
+	**[lettering](https://raw.github.com/davatron5000/Lettering.js/master/jquery.lettering.js)**, 
+	**[masonry](http://masonry.desandro.com/masonry.pkgd.min.js)**, 
+	**[mixitup](https://raw.github.com/barrel/mixitup/master/jquery.mixitup.min.js)**, 
+	**[modernizr](http://modernizr.com/downloads/modernizr-latest.js)**, 
+	**[mootools](https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js)** (1.4.5), 
+	**[normalize](http://necolas.github.io/normalize.css/2.1.3/normalize.css)** (2.1.3), 
+	**[prototype](https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js)** (1.7.1.0), 
+	**[pure](http://yui.yahooapis.com/pure/0.3.0/pure-min.css)** (0.3.0), 
+	**[reset5](http://reset5.googlecode.com/hg/reset.min.css)**, 
+	**[responsiveslides-css](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.css)**, 
+	**[responsiveslides-js](https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js)**, 
+	**[scriptaculous](https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js)** (1.9.0), 
+	**[skeleton](http://www.getskeleton.com/)** (1.2), 
+	**[skeleton-grid](http://www.getskeleton.com/)** (1.2), 
+	**[stellar](https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js)**, 
+	**[swfobject](https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js)** (2.2), 
+	**[waypoints](https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js)**, 
+	**[webfont](https://ajax.googleapis.com/ajax/libs/webfont/1.5.0/webfont.js)** (1.5.0), 
+	**[yui-reset](http://yui.yahooapis.com/3.14.0/build/cssreset/cssreset-min.css)** (3.14.0)
 	
 
 
@@ -133,7 +133,7 @@ In order to use any of the setting below, just add them to the query string in t
 
 ### Requirements
 
-- **PHP 4.3+** - Core functionality (minification and concatenization)  
+- **PHP 5+** - Core functionality (minification and concatenization)  
 - **PHP 5.1?** - Sass/SCSS Compiler (Just a guess as to which version is necessary)
 - **PHP 5.1+** - LESS Compiler
 - **PHP 5.3+** - CoffeeScript Compiler
@@ -145,6 +145,8 @@ Cinch is made with the help of:
 
 - [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at [Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
 
-- [lessphp](http://leafo.net/lessphp/)/[scssphp](http://leafo.net/scssphp/) - LESS/SCSS Processing by [leafo](http://leafo.net/)
+- Nicolas Martin's [PHP port](http://joliclic.free.fr/php/javascript-packer/en/) of Dean Edward's [Packer](http://dean.edwards.name/packer/)
 
-- [coffeescript-php](https://github.com/alxlit/coffeescript-php) - CoffeeScript Processing by alxlit
+- [LESS/SCSS Processing](http://leafo.net/lessphp/)/[scssphp](http://leafo.net/scssphp/) by [leafo](http://leafo.net/)
+
+- [CoffeeScript Processing](https://github.com/alxlit/coffeescript-php) by alxlit
