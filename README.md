@@ -37,7 +37,7 @@ Just upload the 'cinch' folder to **the root folder of your site**, and replace 
 	<script src="/js/functions.js" type="text/javascript"></script>
 	<script src="/js/scripts.js" type="text/javascript"></script>
 	
-turns into:
+looks like this in cinch:
 
 	<script src="/cinch/?files=/js/jquery.min.js,/js/functions.js,/js/scripts.js" type="text/javascript"></script>
 
@@ -70,7 +70,7 @@ In order to use any of the setting below, just add them to the query string in t
 
 	Example: `?files=!/js/plugin.min.js,!/js/scripts.js`
 
-- **[library-name/version]** - To include a library from [Google Hosted Libraries](https://developers.google.com/speed/libraries/) selection, enclose the name of the library and the version number in a pair of square brackets, separated by a forward slash (/). If no version is given, the latest version of the libary will be used (as of this writing).
+- **[library-name/version]** - To include an external library from the list below, enclose the name of the library and the version number(optional) in a pair of square brackets, separated by a forward slash (/). If no version is given, the latest version of the libary will be used (as of when this was last updated).
 
 	Example: `?files=[jquery]` or `?files=[jquery/1.10.2]`
 
