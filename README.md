@@ -1,4 +1,4 @@
-Cinch 0.5
+Cinch 0.6
 =========
 
 A simple, streamlined plugin to minimize and cache JS/CSS files.
@@ -18,7 +18,8 @@ Furthermore, it's perfect for both development and production environments. Cinc
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
 - Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
-- Built-in access to tons of common libraries, such as jQuery, Prototype, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/) and [960.gs](http://960.gs/), and a variety of javascript plugins. See the entire list below.
+- Built-in access to tons of common libraries, such as jQuery, Prototype, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/), [960.gs](http://960.gs/), and [Bourbon](http://bourbon.io/), and a variety of javascript plugins. See the entire list below.
+- Adds CSS vendor prefixes automatically, along with a bunch of CSS enhancements
 - Combines multiple files into one file to reduce HTTP connections between the server and your users
 - Caches files on server if no new changes have been detected to the source files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
@@ -133,13 +134,29 @@ In order to use any of the setting below, just add them to the query string in t
 - **PHP 5.3+** - CoffeeScript Compiler
 
 
+
+### Other Notes and Goodies
+
+- [Bourbon](http://bourbon.io/) and [Bourbon Neat](http://neat.bourbon.io/) mixins libraries have been packaged with cinch, and can be added by using an '@import' inside your Sass files, like so:
+	
+	<code>@import 'path/to/cinch/libraries/bourbon/bourbon';</code>
+	
+	<code>@import 'path/to/cinch/libraries/neat/neat';</code>
+
+- A separate cache file is created for each combination of JS/CSS files that you use, so that different pages with different requirements can still run as quickly as possible. In order to prevent this folder from being overloaded on a busy development server, the cache is automatically cleared about once a month.
+
+
+
+
 ### Special Thanks
 
 Cinch is made with the help of:
 
-- [JS minification](http://razorsharpcode.blogspot.com/2010/02/lightweight-javascript-and-css.html) at [Razor-Sharp Code](http://razorsharpcode.blogspot.com/)
+- [css_optimizer](https://github.com/javiermarinros/css_optimizer) by [Javier Marín](https://github.com/javiermarinros)
 
 - Nicolas Martin's [PHP port](http://joliclic.free.fr/php/javascript-packer/en/) of Dean Edward's [Packer](http://dean.edwards.name/packer/)
+
+- [JsShrink](https://github.com/vrana/JsShrink/) by Jakub Vrána
 
 - [LESS/SCSS Processing](http://leafo.net/lessphp/)/[scssphp](http://leafo.net/scssphp/) by [leafo](http://leafo.net/)
 
