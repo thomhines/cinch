@@ -59,6 +59,7 @@ $libraries= array( // array(library URL, default version number, css/js)
 
 
 
+if($_GET['min'] === "false") $_GET['min'] = false;
 
 
 // USE CORRECT CONTENT TYPE 
@@ -109,27 +110,19 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 	foreach($file_array as $file) { // combine files
 		
 		// MINIFY FILES
-		if($_GET['min'] === true || !isset($_GET['min'])) {
-			$compress_file = true;
-			require_once('processors/css.php');
-			require_once('processors/packer-1.1/class.JavaScriptPacker.php');
-		}
-		else $compress_file = false;
-		
+		$compress_file = isset($_GET['min']) ? $_GET['min'] : true;
 		if(substr($file,0,1) == "!") { // don't minify file if marked with an '!'
 			$compress_file = false;
 			if(substr($file,0,1) == "!") $file = substr($file,1); // remove '!' from the front of filename
 		}
-		
-		
+				
 		// LOAD AND READ FILE
 		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
 			$compress_file = false;
 			$temp_content = loadExternalLibrary($file);
 			if(!$temp_content) $error .= "'".$file."' is not a valid library name.\n";
-		} 
-		
-		
+		}
+	
 		else { // LOAD A LOCAL FILE
 			if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
 			else {
@@ -142,9 +135,7 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 				}
 			}
 		}
-		
-		
-		
+				
 		// NO ERRORS, LOAD FILE
 		if($temp_content) {
 			
@@ -157,12 +148,22 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			// IF COFFEESCRIPT, PROCESS AND CONVERT TO JS
 			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
 
-			// MINIFY CONTENT			
-			if($compress_file && $_GET['t']=='js'){
-				$packer = new JavaScriptPacker($temp_content, 'Normal', true, false);
-				$temp_content = $packer->pack();
+			// MINIFY/PACK CONTENT		
+			if($compress_file && $_GET['t']=='js'){	// Javascript		
+				if($compress_file === 'pack') {
+					require_once('processors/packer-1.1/class.JavaScriptPacker.php');
+					$packer = new JavaScriptPacker($temp_content, 'Normal', true, false);
+					$temp_content = $packer->pack();
+				} else {
+					require_once('processors/jsShrink.php');
+					$temp_content = jsShrink($temp_content);
+				
+				}
+			} elseif($compress_file) { //CSS
+				require_once('processors/css_optimizer/css_optimizer.php');
+				$css_optimizer = new css_optimizer();
+				$temp_content = $css_optimizer->process($temp_content);
 			}
-			elseif($compress_file) $temp_content = minifyCSS($temp_content);
 
 			// FIX LINKS TO EXTERNAL FILES IN CSS
 			if($_GET['t'] == 'css') {
