@@ -228,6 +228,8 @@ ob_end_flush();
 
 // PARSES SASS/SCSS
 function convertSASS($src, $file) {
+
+	//$bourbon = @file_get_contents('/libraries/bourbon/bourbon';" . $src ;
 	
 	$path = "../".dirname($file)."/";
 	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
@@ -240,6 +242,10 @@ function convertSASS($src, $file) {
 	require_once('processors/scss/scss.inc.php');
 	$scss = new scssc();
 	$scss->addImportPath($path);
+	
+	// ADD BOURBON
+	$src = "@import 'libraries/bourbon/_bourbon.scss';\n" . $src;
+	
 	try {
 		$css = $scss->compile($src);	
 	} catch(Exception $e) {
