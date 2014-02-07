@@ -1,0 +1,162 @@
+{
+	"960gs": {
+		"url": "https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css",
+		"ver": "1.0",
+		"type": "css"
+	},
+	"angular": {
+		"url": "https://ajax.googleapis.com/ajax/libs/angularjs/{version}/angular.min.js",
+		"ver": "1.2.4",
+		"type": "js"
+	},
+	"bootstrap-css": {
+		"url": "http://netdna.bootstrapcdn.com/bootstrap/{version}/css/bootstrap.min.css",
+		"ver": "3.0.3",
+		"type": "css"
+	},
+	"bootstrap-theme-css": {
+		"url": "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css",
+		"ver": "3.0.3",
+		"type": "css"
+	},
+	"bootstrap-js": {
+		"url": "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js",
+		"ver": "3.0.3",
+		"type": "js"
+	},
+	"chrome-frame": {
+		"url": "https://ajax.googleapis.com/ajax/libs/chrome-frame/{version}/CFInstall.min.js",
+		"ver": "1.0.3",
+		"type": "js"
+	},
+	"cssreset": {
+		"url": "http://meyerweb.com/eric/tools/css/reset/reset.css",
+		"ver": "2.0",
+		"type": "css"
+	},
+	"cycle2": {
+		"url": "http://malsup.github.io/min/jquery.cycle2.min.js",
+		"ver": "20131022",
+		"type": "js"
+	},
+	"d3": {
+		"url": "https://raw.github.com/mbostock/d3/master/d3.min.js",
+		"ver": "3.4.1",
+		"type": "js"
+	},
+	"dojo": {
+		"url": "https://ajax.googleapis.com/ajax/libs/dojo/{version}/dojo/dojo.js",
+		"ver": "1.9.1",
+		"type": "js"
+	},
+	"ext-core": {
+		"url": "https://ajax.googleapis.com/ajax/libs/ext-core/{version}/ext-core.js",
+		"ver": "3.1.0",
+		"type": "js"
+	},
+	"foldy960": {
+		"url": "https://raw.github.com/davatron5000/Foldy960/master/style.css",
+		"ver": "1.0",
+		"type": "css"
+	},
+	"foundation-css": {
+		"url": "libraries/foundation/{version}/foundation.min.css",
+		"ver": "5.0.2",
+		"type": "css"
+	},
+	"foundation-js": {
+		"url": "libraries/foundation/{version}/foundation.min.js",
+		"ver": "5.0.2",
+		"type": "js"
+	},
+	"html5shiv": {
+		"url": "http://html5shiv.googlecode.com/svn/trunk/html5.js",
+		"ver": "3.7.0",
+		"type": "js"
+	},
+	"isotope-css": {
+		"url": "https://raw.github.com/desandro/isotope/master/css/style.css",
+		"ver": "1.2.25",
+		"type": "css"
+	},
+	"isotope-js": {
+		"url": "https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js",
+		"ver": "1.2.25",
+		"type": "js"
+	},
+	"jquery": {
+		"url": "https://ajax.googleapis.com/ajax/libs/jquery/{version}/jquery.min.js",
+		"ver": "1.11.0",
+		"type": "js"
+	},
+	"jqueryui": {
+		"url": "https://ajax.googleapis.com/ajax/libs/jqueryui/{version}/jquery-ui.min.js",
+		"ver": "1.10.3",
+		"type": "js"
+	},
+	"kube": {
+		"url": "http://imperavi.com/css/kube.css",
+		"ver": "2.0.0",
+		"type": "css"
+	},
+	"masonry": {
+		"url": "http://masonry.desandro.com/masonry.pkgd.min.js",
+		"ver": "3.1.3",
+		"type": "js"
+	},
+	"modernizr": {
+		"url": "http://modernizr.com/downloads/modernizr-latest.js",
+		"ver": "2.7.1",
+		"type": "js"
+	},
+	"mootools": {
+		"url": "https://ajax.googleapis.com/ajax/libs/mootools/{version}/mootools-yui-compressed.js",
+		"ver": "1.4.5",
+		"type": "js"
+	},
+	"normalize": {
+		"url": "http://necolas.github.io/normalize.css/{version}/normalize.css",
+		"ver": "2.1.3",
+		"type": "css"
+	},
+	"prototype": {
+		"url": "https://ajax.googleapis.com/ajax/libs/prototype/{version}/prototype.js",
+		"ver": "1.7.1.0",
+		"type": "js"
+	},
+	"pure": {
+		"url": "http://yui.yahooapis.com/pure/{version}/pure-min.css",
+		"ver": "0.4.1",
+		"type": "css"
+	},
+	"scriptaculous": {
+		"url": "https://ajax.googleapis.com/ajax/libs/scriptaculous/{version}/scriptaculous.js",
+		"ver": "1.9.0",
+		"type": "js"
+	},
+	"jquery-scrollto": {
+		"url": "http://flesler-plugins.googlecode.com/files/jquery.scrollTo-1.4.3.1-min.js",
+		"ver": "1.4.3.1",
+		"type": "js"
+	},
+	"swfobject": {
+		"url": "https://ajax.googleapis.com/ajax/libs/swfobject/{version}/swfobject.js",
+		"ver": "2.2",
+		"type": "js"
+	},
+	"jquery-waypoints": {
+		"url": "https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js",
+		"ver": "2.0.4",
+		"type": "js"
+	},
+	"webfont": {
+		"url": "https://ajax.googleapis.com/ajax/libs/webfont/{version}/webfont.js",
+		"ver": "1.5.0",
+		"type": "js"
+	},
+	"yui-reset": {
+		"url": "http://yui.yahooapis.com/{version}/build/cssreset/cssreset-min.css",
+		"ver": "3.14.0",
+		"type": "css"
+	}
+}

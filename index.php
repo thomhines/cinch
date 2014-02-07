@@ -19,61 +19,40 @@ else ob_start();
 if(!isset($_GET['files'])) exit(); // if no files have been selected, stop here
 
 
+// SET DEFAULTS
+
+$_GET['type'] = isset($_GET['type']) ? $_GET['type'] : 'auto';
+$_GET['min'] = isset($_GET['min']) ? $_GET['min'] : true;
+$_GET['force'] = isset($_GET['force']) ? $_GET['force'] : false;
+$_GET['debug'] = isset($_GET['debug']) ? $_GET['debug'] : true;
+
+
+
+
 // PREPARE VARIABLES
 $file_array = explode(',', $_GET['files']); 
 $cachefile = 'cache/'.md5(implode(",", $_GET)); // build cache filename based on current parameters
 $filepath = $_SERVER['SCRIPT_FILENAME']; // set path to site root folder
 $filepath = str_replace('cinch/index.php', '', $filepath); // remove reference to cinch folder
 
-$libraries= array( // array(library URL, default version number, css/js)
-	'960gs' => array('https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css', '1.0', 'css'),
-	'angular' => array('https://ajax.googleapis.com/ajax/libs/angularjs/{version}/angular.min.js', '1.2.4', 'js'),
-	'bootstrap-css' => array('http://netdna.bootstrapcdn.com/bootstrap/{version}/css/bootstrap.min.css', '3.0.3', 'css'),
-	'bootstrap-theme-css' => array('http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css', '3.0.3', 'css'),
-	'bootstrap-js' => array('http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js', '3.0.3', 'js'),
-	'chrome-frame' => array('https://ajax.googleapis.com/ajax/libs/chrome-frame/{version}/CFInstall.min.js', '1.0.3', 'js'),
-	'cssreset' => array('http://meyerweb.com/eric/tools/css/reset/reset.css', '2.0', 'css'),
-	'cycle2' => array('http://malsup.github.io/min/jquery.cycle2.min.js', '20131022', 'js'),
-	'dojo' => array('https://ajax.googleapis.com/ajax/libs/dojo/{version}/dojo/dojo.js', '1.9.1', 'js'),
-	'ext-core' => array('https://ajax.googleapis.com/ajax/libs/ext-core/{version}/ext-core.js', '3.1.0', 'js'),
-	'foldy960' => array('https://raw.github.com/davatron5000/Foldy960/master/style.css', '1.0', 'css'),
-	'foundation-css' => array('libraries/foundation/{version}/foundation.min.css', '5.0.2', 'css'),
-	'foundation-js' => array('libraries/foundation/{version}/foundation.min.js', '5.0.2', 'js'),
-	'html5shiv' => array('http://html5shiv.googlecode.com/svn/trunk/html5.js', '3.7.0', 'js'),
-	'isotope-css' => array('https://raw.github.com/desandro/isotope/master/css/style.css', '1.2.25', 'css'),
-	'isotope-js' => array('https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js', '1.2.25', 'js'),
-	'jquery' => array('https://ajax.googleapis.com/ajax/libs/jquery/{version}/jquery.min.js', '1.10.2', 'js'),
-	'jqueryui' => array('https://ajax.googleapis.com/ajax/libs/jqueryui/{version}/jquery-ui.min.js', '1.10.3', 'js'),
-	'kube' => array('http://imperavi.com/css/kube.css', '2.0.0', 'css'),
-	'masonry' => array('http://masonry.desandro.com/masonry.pkgd.min.js', '3.1.3', 'js'),
-	'modernizr' => array('http://modernizr.com/downloads/modernizr-latest.js', '2.7.1', 'js'),
-	'mootools' => array('https://ajax.googleapis.com/ajax/libs/mootools/{version}/mootools-yui-compressed.js', '1.4.5', 'js'),
-	'normalize' => array('http://necolas.github.io/normalize.css/{version}/normalize.css', '2.1.3', 'css'),
-	'prototype' => array('https://ajax.googleapis.com/ajax/libs/prototype/{version}/prototype.js', '1.7.1.0', 'js'),
-	'pure' => array('http://yui.yahooapis.com/pure/{version}/pure-min.css', '0.3.0', 'css'),
-	'scriptaculous' => array('https://ajax.googleapis.com/ajax/libs/scriptaculous/{version}/scriptaculous.js', '1.9.0', 'js'),
-	'swfobject' => array('https://ajax.googleapis.com/ajax/libs/swfobject/{version}/swfobject.js', '2.2', 'js'),
-	'webfont' => array('https://ajax.googleapis.com/ajax/libs/webfont/{version}/webfont.js', '1.5.0', 'js'),
-	'yui-reset' => array('http://yui.yahooapis.com/{version}/build/cssreset/cssreset-min.css', '3.14.0', 'css'),
-);	
 
+// LOAD LIST OF LIBRARIES
+$libraries = json_decode(file_get_contents('libraries.json'), true);
 
-
-if($_GET['min'] === "false") $_GET['min'] = false;
 
 
 // USE CORRECT CONTENT TYPE 
-if($_GET['t']=='auto' || !isset($_GET['t'])) { // auto detect content type
+if($_GET['type']=='auto') { // auto detect content type
 	if(substr($file_array[0], 0, 1) == '[') {
 		preg_match("/\[([^\/]*)\/?(.*)?\]/", $file_array[0], $library_array);
 		$library_info = $libraries[$library_array[1]];
 	}
 	
-	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee' || $library_info[2] == 'js') $_GET['t'] = 'js';
-	else $_GET['t'] = 'css';
+	if(substr($file_array[0], -3) == '.js' || substr($file_array[0], -7) == '.coffee' || $library_info['type'] == 'js') $_GET['type'] = 'js';
+	else $_GET['type'] = 'css';
 } 
 
-if($_GET['t']=='js') { // JS
+if($_GET['type']=='js') { // JS
 	header("Content-type: application/x-javascript; charset: UTF-8"); 
 	$cachefile .= '.js';
 }
@@ -81,6 +60,8 @@ else { // otherwise, assume CSS
 	header("Content-type: text/css; charset: UTF-8");
 	$cachefile .= '.css';
 }
+
+
 
 
 if(file_exists($cachefile)) $timestamp = filemtime($cachefile);
@@ -104,26 +85,33 @@ else {
 
 
 // IF NEW CHANGES HAVE BEEN DETECTED, REBUILD CACHE FILE
-if($new_changes || $_GET['force'] || $_GET['clearcache']) {
+if($new_changes || $_GET['force']) {
 
 	$content = '';
 	foreach($file_array as $file) { // combine files
-		
-		// MINIFY FILES
-		$compress_file = isset($_GET['min']) ? $_GET['min'] : true;
+
+		// ENABLE/DISABLE FILE MINIFICATION
+		$compress_file = $_GET['min'];
 		if(substr($file,0,1) == "!") { // don't minify file if marked with an '!'
 			$compress_file = false;
-			if(substr($file,0,1) == "!") $file = substr($file,1); // remove '!' from the front of filename
+			$file = substr($file,1); // remove '!' from the front of filename
 		}
-				
-		// LOAD AND READ FILE
-		if(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
-			$compress_file = false;
+		
+		// LOAD A REMOTE FILE
+		if(strpos($file, 'http://') !== false) {
+			$file = preg_replace("/\[(.*)\]/", "$1", $file);
+			if(!$temp_content = @file_get_contents($file)) $error .= "'".$file."' is not a valid file.\n";
+		}
+		
+		// LOAD LIBRARY FILE
+		elseif(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
+			//$compress_file = false;
 			$temp_content = loadExternalLibrary($file);
 			if(!$temp_content) $error .= "'".$file."' is not a valid library name.\n";
 		}
-	
-		else { // LOAD A LOCAL FILE
+		
+		// ELSE, LOAD A LOCAL FILE
+		else {
 			if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
 			else {
 				if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
@@ -149,7 +137,8 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			if(substr($file, -7) == '.coffee') $temp_content = convertCoffee($temp_content);
 
 			// MINIFY/PACK CONTENT		
-			if($compress_file && $_GET['t']=='js'){	// Javascript		
+			if($compress_file && $_GET['type']=='js'){	// Javascript		
+
 				if($compress_file === 'pack') {
 					require_once('processors/packer-1.1/class.JavaScriptPacker.php');
 					$packer = new JavaScriptPacker($temp_content, 'Normal', true, false);
@@ -166,7 +155,7 @@ if($new_changes || $_GET['force'] || $_GET['clearcache']) {
 			}
 
 			// FIX LINKS TO EXTERNAL FILES IN CSS
-			if($_GET['t'] == 'css') {
+			if($_GET['type'] == 'css') {
 				$path = "../".dirname($file)."/"; // trailing slash just in case user didn't add a leading slash to their CSS file path
 				$temp_content = preg_replace("/url\s?\(['\"]?((?!http|\/)[^'\"\)]*)['\"]?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
 			}
@@ -288,15 +277,16 @@ function loadExternalLibrary($file) {
 	
 	preg_match("/\[([^\/]*)\/?(.*)?\]/", $file, $file_array);
 	$library_name = strtolower($file_array[1]);
-	$version = $file_array[2] ? $file_array[2] : $library[1];
 	
 	$library = $libraries[$library_name];
-	$library_url =  str_replace('{version}', $version, $library[0]);
+	$version = $file_array[2] ? $file_array[2] : $library['ver'];
+		
+	$library_url =  str_replace('{version}', $version, $library['url']);
 	$local_library_url = "libraries/$library_name/{$library[1]}/".basename($library_url);
 	
 	// IF SERVER CAN'T REMOTELY ACCESS FILES, OR NO VERSION NUMBER IS SELECTED, USE LOCAL VERSION
-	if(ini_get("allow_url_fopen") == 0 || !$file_array[2]) {
-		if(ini_get("allow_url_fopen") == 0) $error .= "Your server does not allow for access to remote libraries. A local version of $library_name was used instead.\n";
+	if(ini_get("allow_url_fopen") == 0) {
+		if(ini_get("allow_url_fopen") == 0) $error .= "Your server does not allow for access to remote libraries. You may need to load the file onto the server manually.\n";
 		$library_url = $local_library_url; // reset url to local version
 	}
 	
@@ -305,7 +295,7 @@ function loadExternalLibrary($file) {
 	
 	// IF FILE CONTENTS FAILED TO LOAD, GET LOCAL VERSION
 	if(!$file_contents) {
-		$error .= "The external library $library_name could not be loaded. A local version was used instead.\n";
+		$error .= "The external library '$library_name' could not be loaded. A local version was used instead.\n";
 		$file_contents = @file_get_contents($local_library_url);
 	}
 	

@@ -1,7 +1,7 @@
 Cinch 0.6
 =========
 
-A simple, streamlined plugin to minimize and cache JS/CSS files.
+A simple, streamlined way to combine, compress, and cache web files.
 
 
 
@@ -123,7 +123,7 @@ In order to use any of the setting below, just add them to the query string in t
 	- NOTE: Files will still be concatenated and cached.
 	- NOTE: Files marked with a '!' in order to avoid minification will no be minified regardless of this setting's value.
 	
-- **debug=(true|false*)** - When enabled, output files display errors. Otherwise, errors are ignored.
+- **debug=(true*|false)** - When enabled, output files display errors. Otherwise, errors are ignored.
 
 
 ### Requirements
