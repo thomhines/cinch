@@ -59,14 +59,24 @@
 		"ver": "1.0",
 		"type": "css"
 	},
+	"font-awesome": {
+		"url": "http://netdna.bootstrapcdn.com/font-awesome/{version}/css/font-awesome.css",
+		"ver": "4.0.3",
+		"type": "css"
+	},
 	"foundation-css": {
-		"url": "libraries/foundation/{version}/foundation.min.css",
+		"url": "http://cdn.foundation5.zurb.com/foundation.css",
 		"ver": "5.0.2",
 		"type": "css"
 	},
 	"foundation-js": {
-		"url": "libraries/foundation/{version}/foundation.min.js",
+		"url": "http://cdn.foundation5.zurb.com/foundation.js",
 		"ver": "5.0.2",
+		"type": "js"
+	},
+	"hammer": {
+		"url": "https://raw.github.com/EightMedia/hammer.js/1.0.6/hammer.min.js",
+		"ver": "1.0.6",
 		"type": "js"
 	},
 	"html5shiv": {
@@ -139,6 +149,16 @@
 		"ver": "1.4.3.1",
 		"type": "js"
 	},
+	"responsive-slides": {
+		"url": "https://raw.github.com/viljamis/ResponsiveSlides.js/master/responsiveslides.min.js",
+		"ver": "1.54",
+		"type": "js"
+	},
+	"stellar": {
+		"url": "https://raw.github.com/markdalgleish/stellar.js/master/jquery.stellar.min.js",
+		"ver": "0.6.2",
+		"type": "js"
+	},
 	"swfobject": {
 		"url": "https://ajax.googleapis.com/ajax/libs/swfobject/{version}/swfobject.js",
 		"ver": "2.2",
@@ -147,6 +167,11 @@
 	"jquery-waypoints": {
 		"url": "https://raw.github.com/imakewebthings/jquery-waypoints/master/waypoints.min.js",
 		"ver": "2.0.4",
+		"type": "js"
+	},
+	"waypoints": {
+		"url": "https://raw.github.com/imakewebthings/jquery-waypoints/{version}/waypoints.min.js",
+		"ver": "2.0.1",
 		"type": "js"
 	},
 	"webfont": {

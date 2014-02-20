@@ -20,7 +20,10 @@ if(!isset($_GET['files'])) exit(); // if no files have been selected, stop here
 
 
 // SET DEFAULTS
-
+foreach($_GET as $key => $value) {
+	if($_GET[$key] == 'false') $_GET[$key] = false;
+	elseif($_GET[$key] == 'true') $_GET[$key] = true;
+}
 $_GET['type'] = isset($_GET['type']) ? $_GET['type'] : 'auto';
 $_GET['min'] = isset($_GET['min']) ? $_GET['min'] : true;
 $_GET['force'] = isset($_GET['force']) ? $_GET['force'] : false;
@@ -61,12 +64,13 @@ else { // otherwise, assume CSS
 	$cachefile .= '.css';
 }
 
-
-
+$new_changes = false;
 
 if(file_exists($cachefile)) $timestamp = filemtime($cachefile);
-else $timestamp = 0;
-$new_changes = false;
+else {
+	$timestamp = 0;
+	$new_changes = true;
+}
 
 // CLEAR CACHE IF CACHE IS OLDER THAN ONE MONTH
 $one_month_ago = strtotime("-1 month");
@@ -87,9 +91,13 @@ else {
 // IF NEW CHANGES HAVE BEEN DETECTED, REBUILD CACHE FILE
 if($new_changes || $_GET['force']) {
 
+
 	$content = '';
 	foreach($file_array as $file) { // combine files
 
+		$temp_content = '';
+		$library_info = '';
+		
 		// ENABLE/DISABLE FILE MINIFICATION
 		$compress_file = $_GET['min'];
 		if(substr($file,0,1) == "!") { // don't minify file if marked with an '!'
@@ -100,30 +108,31 @@ if($new_changes || $_GET['force']) {
 		// LOAD A REMOTE FILE
 		if(strpos($file, 'http://') !== false) {
 			$file = preg_replace("/\[(.*)\]/", "$1", $file);
-			if(!$temp_content = @file_get_contents($file)) $error .= "'".$file."' is not a valid file.\n";
+			if(!$temp_content = @file_get_contents($file)) $error .= "- '".$file."' is not a valid file.\n";
 		}
 		
 		// LOAD LIBRARY FILE
 		elseif(substr($file, 0, 1) == '[') { // LOAD A FILE FROM EXTERNALLY HOSTED LIBRARY
-			//$compress_file = false;
+			$compress_file = false;
+			$library_info = loadLibraryInfo($file);
+			$file = $library_info['library_url'];
 			$temp_content = loadExternalLibrary($file);
-			if(!$temp_content) $error .= "'".$file."' is not a valid library name.\n";
 		}
 		
 		// ELSE, LOAD A LOCAL FILE
 		else {
-			if(!is_file($filepath.$file)) $error .= "'".$file."' is not a valid file.\n";
+			if(!is_file($filepath.$file)) $error .= "- '".$file."' is not a valid file.\n";
 			else {
-				if(!$handle = fopen($filepath.$file, "r")) $error .= "There was an error trying to open '".$file."'.\n";
+				if(!$handle = fopen($filepath.$file, "r")) $error .= "- There was an error trying to open '".$file."'.\n";
 				else {
 					$temp_content = "";
-					if(filesize($filepath.$file) == 0) $error .= "'".$file."' is an empty file.\n";
-					elseif(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "There was an error trying to open '".$file."'.\n";
+					if(filesize($filepath.$file) == 0) $error .= "- '".$file."' is an empty file.\n";
+					elseif(!$temp_content = fread($handle, filesize($filepath.$file))) $error .= "- There was an error trying to open '".$file."'.\n";
 					fclose($handle);
 				}
 			}
 		}
-				
+
 		// NO ERRORS, LOAD FILE
 		if($temp_content) {
 			
@@ -160,29 +169,28 @@ if($new_changes || $_GET['force']) {
 				$temp_content = preg_replace("/url\s?\(['\"]?((?!http|\/)[^'\"\)]*)['\"]?\)/", "url(".$path."$1)", $temp_content); // if path is absolute, leave it alone. otherwise, relink assets based on path from css file
 			}
 			
-			if($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content."\n\n";
+			if($_GET['debug'] && $library_info) $temp_content = "/* ".$library_info['library_name']." */\n".$temp_content."\n\n";
+			elseif($_GET['debug'] && $temp_content) $temp_content = "/* $file */\n".$temp_content."\n\n";
 			if($temp_content) $content .= $temp_content;
 		}			
 	}	
 	
 	// OUTPUT FILE
-	if(!$handle = fopen($cachefile, 'w')) {
-		 echo "ERROR: Cannot open cache file.\n";
-		 exit;
+	if($handle = fopen($cachefile, 'w')) {
+		if(fwrite($handle, $content) === FALSE) {
+			$error .= "- Cannot write to cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
+		}
 	}
-	if(fwrite($handle, $content) === FALSE) {
-		echo "ERROR: Cannot write to cache file.\n";
-		exit;
-	}
+	else $error .= "- Cannot open cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
 	fclose($handle);
 
 	$timestamp = filemtime($cachefile);
+	if(!$timestamp) $timestamp = date();
 } 
-
-
 
 // SET HEADERS TO CACHE FILES PROPERLY IN BROWSER
 $gmt_mtime = gmdate('r', $timestamp);
+session_cache_limiter(‘public’);
 header('ETag: "'.md5($timestamp.$cachefile).'"');
 header('Last-Modified: '.$gmt_mtime);
 header('Cache-Control: public');
@@ -190,11 +198,7 @@ header('Cache-Control: public');
 
 
 // IF THERE IS A NEW CACHE FILE, SEND NEW CONTENT
-if($content) {
-	if($_GET['debug'] && isset($error)) echo "/*\n\nERROR:\n$error \n*/\n\n";
-	echo $content;
-}
-
+if($content) printOutputContent($content);
 
 
 // IF FILE IS ALREADY IN USER'S CACHE, SEND 304 NOT MODIFIED HEADER
@@ -208,14 +212,14 @@ elseif ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '',
 // OTHERWISE, LOAD CACHED FILE AND SEND TO USER
 else {
 	if(!$handle = fopen($cachefile, "r")) {
-		echo "/*\nERROR: There was an error trying to open '".$cachefile."'.\n*/\n\n";
-		exit;
+		$error .=  "- There was an error trying to open cache file: '".$cachefile."'.\n";
+		//exit;
+	} else {
+		$content = fread($handle, filesize($cachefile));
+		fclose($handle);
 	}
-	$content = fread($handle, filesize($cachefile));
-	fclose($handle);
 	
-	if($_GET['debug'] && isset($error)) echo "/*\nERROR:\n$error \n*/\n\n";
-	echo $content;	
+	printOutputContent($content);
 }
 
 ob_end_flush();
@@ -226,12 +230,20 @@ ob_end_flush();
 	FUNCTIONS
 *----------------------------------------------------------------------*/
 
+function printOutputContent($content) {
+	global $error;
+	if($_GET['debug'] && isset($error)) echo "/*\n\nERROR:\n$error\n*/\n\n";
+	echo trim($content);	
+}
+
+
 // PARSES SASS/SCSS
 function convertSASS($src, $file) {
-
-	//$bourbon = @file_get_contents('/libraries/bourbon/bourbon';" . $src ;
+	global $error;
 	
-	$path = "../".dirname($file)."/";
+	if(substr($file, 0, 4) == 'http') $path = dirname($file)."/";
+	else $path = "../".dirname($file)."/";
+	
 	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
 	if(strpos($src, "{") === false) {
 		// IF SO, CONVERT IT TO SCSS
@@ -249,13 +261,15 @@ function convertSASS($src, $file) {
 	try {
 		$css = $scss->compile($src);	
 	} catch(Exception $e) {
-		if($_GET['debug']) echo "/*\nERROR: $file\n" . $e->getMessage() . " \n*/\n\n";
+		if($_GET['debug']) $error .= "- Sass error in $file: " . $e->getMessage() . ".\n";
+		return;
 	}
 	return $css;
 }
 
 // PARSES LESS
 function convertLESS($src, $file) {
+	global $error;
 	
 	$path = "../".dirname($file)."/";
 	require_once('processors/less/lessc.inc.php');
@@ -264,46 +278,54 @@ function convertLESS($src, $file) {
 	try {
 		$css = $less->compile($src);	
 	} catch(Exception $e) {
-		if($_GET['debug']) echo "/*\nERROR: $file\n" . $e->getMessage() . " \n*/\n\n";
+		if($_GET['debug']) $error .= "- Less error in $file: " . $e->getMessage() . ".\n";
+		return;
 	}
 	return $css;
 }
 
 // PARSES COFFEESCRIPT
-function convertCoffee($src) {	
-	require_once('processors/coffeescript/Init.php');
-	CoffeeScript\Init::load();
-	return CoffeeScript\Compiler::compile($src);
+function convertCoffee($src) {
+	global $error;
+	if (version_compare(PHP_VERSION, '5.3.0') >= 0) require_once('processors/coffeescript/Init.php');
+	else $error .=  "- The coffeescript processor requires PHP 5.3 or greater, which you don't have. All .coffee files are currently being skipped.\n";
 }
 
-
-// RETRIEVE LIBRARY FILE FROM EXTERNALLY HOSTED LIBRARIES
-function loadExternalLibrary($file) {
+function loadLibraryInfo($file) {
 	global $libraries, $error;
 	
 	preg_match("/\[([^\/]*)\/?(.*)?\]/", $file, $file_array);
-	$library_name = strtolower($file_array[1]);
+	$library_info['library_name'] = strtolower($file_array[1]);
 	
-	$library = $libraries[$library_name];
-	$version = $file_array[2] ? $file_array[2] : $library['ver'];
+	$library = $libraries[$library_info['library_name']];
+	
+	if(!$library) {
+		$error .= "- '".$file."' is not a valid library name.\n";
+		return;
+	}
+	
+	$library_info['version'] = $file_array[2] ? $file_array[2] : $library['ver'];
 		
-	$library_url =  str_replace('{version}', $version, $library['url']);
-	$local_library_url = "libraries/$library_name/{$library[1]}/".basename($library_url);
+	$library_info['library_url'] =  str_replace('{version}', $library_info['version'], $library['url']);
 	
+	return $library_info;
+}
+
+// RETRIEVE LIBRARY FILE FROM EXTERNALLY HOSTED LIBRARIES
+function loadExternalLibrary($library_url) {
+	global $error;
+
 	// IF SERVER CAN'T REMOTELY ACCESS FILES, OR NO VERSION NUMBER IS SELECTED, USE LOCAL VERSION
 	if(ini_get("allow_url_fopen") == 0) {
-		if(ini_get("allow_url_fopen") == 0) $error .= "Your server does not allow for access to remote libraries. You may need to load the file onto the server manually.\n";
-		$library_url = $local_library_url; // reset url to local version
+		if(ini_get("allow_url_fopen") == 0) $error .= "- Your server does not allow for access to remote libraries. You may need to upload the file to your web server manually.\n";
 	}
 	
 	// GET FILE CONTENTS	
 	$file_contents = @file_get_contents($library_url);
 	
-	// IF FILE CONTENTS FAILED TO LOAD, GET LOCAL VERSION
-	if(!$file_contents) {
-		$error .= "The external library '$library_name' could not be loaded. A local version was used instead.\n";
-		$file_contents = @file_get_contents($local_library_url);
-	}
+
+	// UPDATE RELATIVE LINKS WITH LIBRARY URL
+	$file_contents = preg_replace("/(url\(\'?)/", "$1".dirname($library_url)."/", $file_contents);
 	
 	return $file_contents;
 }
