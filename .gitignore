@@ -1,3 +1,5 @@
 error_log
 .DS_Store
 cache/*.*s
+cache/*.json
+cache/*/
