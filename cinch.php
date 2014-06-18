@@ -6,7 +6,7 @@
 define('PRODUCTION', false);
 
 
-// You can change the defaults for cinch settings here
+// Defaults for cinch settings can be set here
 $defaults = array (
 	'min' => true,
 	'force' => false,
@@ -28,13 +28,13 @@ define('CINCH_REL_PATH', basename(dirname($_SERVER['PHP_SELF'])) . "/");
 $settings = array();
 $file_array = array('css' => array(), 'js' => array());
 $error = "";
-//$cachefile = "";
 
 
 /*----------------------------------------------------------------------*
 	FUNCTIONS
 *----------------------------------------------------------------------*/
 
+// Main cinch function that coordinates all actions, including caching and setting MIME type
 function cinchMain($_settings) {
 	global $cachefile, $file_array, $settings, $error;
 	
@@ -47,8 +47,9 @@ function cinchMain($_settings) {
 	}
 	
 	// Set Default Settings
-	$settings = setDefaultsSettings($_settings);
+	$settings = setDefaultSettings($_settings);
 	
+	// Send correct MIME type
 	if($settings['type'] == 'js') {
 		unset($file_array['css']);
 		header("Content-type: application/x-javascript; charset: UTF-8"); 
@@ -62,15 +63,16 @@ function cinchMain($_settings) {
 	sortFiles($settings['files']);
 	
 	// See if cache file exists and is current
-	$cachefile = 'cache/'.md5(implode(",", $file_array[$settings['type']])) . "." .$settings['type'];
+	$cachefile = 'cache/'.md5(implode(",", $settings)) . "." .$settings['type'];
 	
+	// If PRODUCTION is set, send cache file and quit
 	if(PRODUCTION) {
 		printCacheFile($cachefile);
 		exit;
 	}
 	
 	
-	
+	// Check to see if cache file exists and if user has most recent version
 	$cachefile_timestamp = hasCacheFile($cachefile, $file_array[$settings['type']]);
 	$gmt_mtime = gmdate('r', $cachefile_timestamp);
 	session_cache_limiter(‘public’);
@@ -88,7 +90,6 @@ function cinchMain($_settings) {
 	
 	// If cache file exists on server and is current, but user doesn't have it yet, send that.
 	if(($cachefile_timestamp && !$settings['force'])) {
-		//printCacheLink($cachefile, $file_type);
 		printCacheFile($cachefile);
 	} 
 
@@ -97,9 +98,6 @@ function cinchMain($_settings) {
 		// Process all files of this type (external libraries, preprocessors, minification, etc.)
 		$file_output = processFileList($file_array[$settings['type']]);
 		
-		// Add error messages to output
-		if($settings['debug'] && $error) $file_output = "/*\n\nERROR:\n$error\n*/\n\n" . $file_output; 
-
 		// Save output to cache file
 		if($handle = fopen($cachefile, 'w')) {
 			if(fwrite($handle, $file_output) === FALSE) {
@@ -110,24 +108,23 @@ function cinchMain($_settings) {
 		if($handle) fclose($handle);
 		
 		// Print output
-		//printCacheLink($cachefile, $file_type);
 		printCacheFile($cachefile);
-
-		
 	}
 }
 
 
 
-
-function setDefaultsSettings($_settings) {
+// Set all settings to default values if no value is given
+function setDefaultSettings($_settings) {
 	global $defaults;
 	
+	// Make true/false values consistent
 	foreach($_settings as $key => $value) {
 		if($_settings[$key] === 'false' || $_settings[$key] === 0) $_settings[$key] = false;
 		elseif($_settings[$key] === 'true' || $_settings[$key] === 0) $_settings[$key] = true;
 	}
 	
+	// If no value is given for a setting, use default
 	foreach($defaults as $name => $default_value) {
 		$_settings[$name] = isset($_settings[$name]) ? $_settings[$name] : $default_value;
 	}
@@ -145,8 +142,7 @@ function setDefaultsSettings($_settings) {
 				break;
 			}
 		}
-	} 
-	
+	}
 	// If type still can't be detected, default to JS
 	if($_settings['type']=='auto') $_settings['type'] = 'js';
 	
@@ -197,7 +193,7 @@ function hasCacheFile($cachefile, $file_array) {
 
 
 
-
+// Find file type (js or css) of selected file
 function getFileType($file) {
 	if(substr($file, -3) == '.js' || substr($file, -7) == '.coffee') return 'js'; // || $library_info['type'] == 'js') $_GET['type'] = 'js';
 	else if(substr($file, -4) == '.css' || substr($file, -5) == '.scss' || substr($file, -5) == '.sass' || substr($file, -5) == '.less') return 'css';
@@ -205,7 +201,7 @@ function getFileType($file) {
 }
 
 
-
+// Sort files into $file_array by type
 function sortFiles($file_list_array, $package = "") {
 	global $file_array, $settings;
 	
@@ -236,7 +232,7 @@ function sortFiles($file_list_array, $package = "") {
 
 
 
-
+// Process all files and combine them into one place
 function processFileList($type_file_array) {
 	global $settings;
 	$content = '';
@@ -259,7 +255,7 @@ function processFileList($type_file_array) {
 
 
 
-
+// Handle minification and pre-processing of file as necessary
 function processFile($file) {
 	global $settings;
 	
@@ -369,78 +365,6 @@ function loadFile($file) {
 
 
 
-
-// PARSES SASS/SCSS
-function convertSASS($src, $file) {
-	
-	if(substr($file, 0, 4) == 'http') $path = dirname($file)."/";
-	else $path = "../".dirname($file)."/";
-	
-	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
-	if(strpos($src, "{") === false) {
-		// IF SO, CONVERT IT TO SCSS
-		require_once('processors/sass.php');
-		$src = sassToScss($src);
-	} 
-	
-	
-	require_once('processors/scss/scss.inc.php');
-	$scss = new scssc();
-	$scss->addImportPath($path);
-	
-	// ADD BOURBON
-	$src = "@import 'libraries/bourbon/_bourbon.scss';\n" . $src;
-	
-	try {
-		$css = $scss->compile($src);	
-	} catch(Exception $e) {
-		recordError("Sass error in $file: " . $e->getMessage() . ".");
-		return;
-	}
-	return $css;
-}
-
-
-
-
-
-// PARSES LESS
-function convertLESS($src, $file) {
-	
-	$path = "../".dirname($file)."/";
-	require_once('processors/less/lessc.inc.php');
-	$less = new lessc();
-	$less->addImportDir($path);
-	try {
-		$css = $less->compile($src);	
-	} catch(Exception $e) {
-		if($settings['debug']) recordError("Less error in $file: " . $e->getMessage() . ".");
-		return;
-	}
-	return $css;
-}
-
-// Minimize CSS
-function minifyCSS($_src) {
-	$_out = preg_replace("/\s+/", " ", $_src); // remove excess spaces
-	$_out = preg_replace("/\s?(,|;|:|{|})\s?/", "$1", $_out); // remove spaces next to CSS specific characters (ie. ;, {, })
-	$_out = preg_replace("/\/\*(.|[\r\n])*?\*\//", "", $_out); // remove comments	
-	$_out = trim($_out);
-
-	return $_out;
-}
-
-
-
-// PARSES COFFEESCRIPT
-function convertCoffee($src) {
-	if (version_compare(PHP_VERSION, '5.3.0') >= 0) require_once('processors/coffeescript/Init.php');
-	else recordError("The coffeescript processor requires PHP 5.3 or greater, which you don't have. All .coffee files are currently being skipped.");
-}
-
-
-
-
 /*
 
 function loadLibraryInfo($file) {
@@ -492,39 +416,8 @@ function loadExternalLibrary($library_url) {
 
 	
 /* INCOMPLETE */
+// Find if package exists on server, and if not, download it. Then add web files to file list.
 function getExternalLibraryFiles($library) {
-/*
-	// Retrieve github repo url from bower listing
-	
-	// If bower list is over a week old, retrieve latest version from site and update local version
-	if(file_exists('cache/bower-directory.json')) $bower_directory = json_decode(file_get_contents('cache/bower-directory.json'));
-	else {
-		$bower_directory_contents = file_get_contents('http://bower.herokuapp.com/packages/');
-		$bower_directory = json_decode($bower_directory_contents);
-		
-		if($handle = fopen('cache/bower-directory.json', 'w')) {
-			if(fwrite($handle, $bower_directory_contents) === FALSE) {
-				recordError("Cannot write to bower directory. Make sure the permissions on your server are set to allow write access to the 'cache' folder.");
-			}
-		}
-		else recordError("Cannot open bower directory. Make sure the permissions on your server are set to allow write access to the 'cache' folder.");
-		fclose($handle);
-	}
-	
-	
-
-	foreach($bower_directory as $bower_item) {
-		if($bower_item->name == $library) {
-			$repo_url = $bower_item->url;
-			break;
-		}
-	}
-	
-	
-	
-	
-*/
-
 	if(strpos($library, '#')) $package = explode('#', $library);
 	elseif(strpos($library, '/')) $package = explode('/', $library);
 	else $package = array($library);
@@ -535,10 +428,6 @@ function getExternalLibraryFiles($library) {
 	// Otherwise, download and unzip repo from github
 	if(!file_exists(CINCH_ABS_PATH.$package_path)) downloadRepo($package);
 
-	// Retrieve library file list from github repo
-	//$repo_path = str_replace("git://github.com/", "", $repo_url);
-	//$repo_path = str_replace(".git", "", $repo_path);
-	//$repo_raw_url = "https://raw.githubusercontent.com/" . $repo_path . "/master/";
 	$package_info = @json_decode(file_get_contents(CINCH_ABS_PATH.$package_path."bower.json"));
 	if(!$package_info) $package_info = @json_decode(file_get_contents(CINCH_ABS_PATH.$package_path."package.json"));
 	if(!$package_info) {
@@ -547,11 +436,6 @@ function getExternalLibraryFiles($library) {
 	}
 
 	$library_files = $package_info->main;
-/*
-	echo " library files: ";	
-	print_r($package_info);
-	echo "!\n";
-*/
 
 	$package_path = CINCH_REL_PATH . $package_path;
 
@@ -569,16 +453,15 @@ function getExternalLibraryFiles($library) {
 }
 
 
-
+// Retrieve git repository url for bower package
 function getRepoUrl($package) {
 	$bower_local = CINCH_ABS_PATH."cache/bower-directory.json";
-
-	// If version number is given, separate file from version number
-	//if(strpos($package, '#')) $package = explode('#', $package);
-	//else $package = array($package);
+	
+	
+	// INCOMPLETE: If bower list is over a week old, delete local version
+	
 	
 	// Retrieve github repo url from bower listing
-	// If bower list is over a week old, retrieve latest version from site and update local version
 	if(file_exists($bower_local)) $bower_directory = json_decode(file_get_contents($bower_local));
 	else {
 		$bower_directory_contents = file_get_contents('http://bower.herokuapp.com/packages/');
@@ -618,6 +501,7 @@ function getRepoUrl($package) {
 	
 	
 	// If version number was included, get version repo url
+	// INCOMPLETE: if version number doesn't check out, check alternate forms (v1.0, 1.0, v1)
 	else {
 		// Load tag list
 /*
@@ -650,7 +534,7 @@ function getRepoUrl($package) {
 
 
 
-
+// Download git repository and unzip it into cache folder
 function downloadRepo($package) {
 	$repo_url = getRepoUrl($package);
 	$zip_file = CINCH_ABS_PATH."cache/".$package[0].".zip";
@@ -673,7 +557,121 @@ function downloadRepo($package) {
 	}
 }
 
-// separates web files and creates links to cache files
+
+
+// Parses sass/scss files
+function convertSASS($src, $file) {
+	
+	if(substr($file, 0, 4) == 'http') $path = dirname($file)."/";
+	else $path = "../".dirname($file)."/";
+	
+	// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
+	if(strpos($src, "{") === false) {
+		// IF SO, CONVERT IT TO SCSS
+		require_once('processors/sass.php');
+		$src = sassToScss($src);
+	} 
+	
+	
+	require_once('processors/scss/scss.inc.php');
+	$scss = new scssc();
+	$scss->addImportPath($path);
+	
+	// ADD BOURBON
+	$src = "@import 'libraries/bourbon/_bourbon.scss';\n" . $src;
+	
+	try {
+		$css = $scss->compile($src);	
+	} catch(Exception $e) {
+		recordError("Sass error in $file: " . $e->getMessage() . ".");
+		return;
+	}
+	return $css;
+}
+
+
+
+
+
+// Parses less files
+function convertLESS($src, $file) {
+	
+	$path = "../".dirname($file)."/";
+	require_once('processors/less/lessc.inc.php');
+	$less = new lessc();
+	$less->addImportDir($path);
+	try {
+		$css = $less->compile($src);	
+	} catch(Exception $e) {
+		if($settings['debug']) recordError("Less error in $file: " . $e->getMessage() . ".");
+		return;
+	}
+	return $css;
+}
+
+// Minimize css files
+function minifyCSS($_src) {
+	$_out = preg_replace("/\s+/", " ", $_src); // remove excess spaces
+	$_out = preg_replace("/\s?(,|;|:|{|})\s?/", "$1", $_out); // remove spaces next to CSS specific characters (ie. ;, {, })
+	$_out = preg_replace("/\/\*(.|[\r\n])*?\*\//", "", $_out); // remove comments	
+	$_out = trim($_out);
+
+	return $_out;
+}
+
+
+
+// Parses coffeescript files
+function convertCoffee($src) {
+	if (version_compare(PHP_VERSION, '5.3.0') >= 0) require_once('processors/coffeescript/Init.php');
+	else recordError("The coffeescript processor requires PHP 5.3 or greater, which you don't have. All .coffee files are currently being skipped.");
+}
+
+
+
+
+// Loads and prints out cache file contents
+function printCacheFile($cachefile) {
+	global $settings, $error;
+	
+	if(!is_file($cachefile)) {
+		recordError("Cache file does not exist.");
+		return;
+	}
+	if(!$handle = fopen($cachefile, "r")) {
+		recordError("There was an error trying to open cache file: '".$cachefile."'.");
+		//exit;
+	} else {
+		$content = fread($handle, filesize($cachefile));
+		fclose($handle);
+	}
+	
+	// Add error messages to output
+	if($settings['debug'] && $error) echo "/*\n\nERROR:\n$error\n*/\n\n";
+	echo trim($content);	
+}
+
+
+
+// Deletes all cache files in cache folder
+function clearCache() {
+	$files = glob('cache/*.*s'); // select all .js and .css files
+	foreach($files as $file){
+		if(is_file($file)) unlink($file);
+	}
+}
+
+
+
+// Keeps track of errors and saves them to a variable for reporting
+function recordError($error_message) {
+	global $error;
+	$error .= "- " . $error_message . "\n";	
+}
+
+
+
+// Separates web files and creates links to cache files
 function cinch($settings) {
 	global $file_array, $error;
 	sortFiles($settings['files']);
@@ -701,57 +699,7 @@ function cinch($settings) {
 			echo '<script type="text/javascript" src="'.$url.'"></script>';
 		}
 	}
-
-/*
-	if($file_type == 'css') {
-		echo '<link rel="Stylesheet" href="'.$cachefile.'" type="text/css" media="all">';				
-	} else {
-		echo '<script type="text/javascript" src="'.$cachefile.'"></script>';
-	}
-*/
 }
-
-
-
-
-function printCacheFile($cachefile) {
-	
-	if(!is_file($cachefile)) {
-		recordError("Cache file does not exist.");
-		return;
-	}
-	if(!$handle = fopen($cachefile, "r")) {
-		recordError("There was an error trying to open cache file: '".$cachefile."'.");
-		//exit;
-	} else {
-		$content = fread($handle, filesize($cachefile));
-		fclose($handle);
-	}
-	
-	if($_settings['debug'] && isset($error)) echo "/*\n\nERROR:\n$error\n*/\n\n";
-	echo trim($content);	
-}
-
-
-
-
-// DELETES ALL CACHE FILES
-function clearCache() {
-	$files = glob('cache/*.*s'); // select all .js and .css files
-	foreach($files as $file){
-		if(is_file($file)) unlink($file);
-	}
-}
-
-
-function recordError($error_message) {
-	global $error;
-	
-	$error .= "- " . $error_message . "\n";	
-}
-
-
-
 
 
 

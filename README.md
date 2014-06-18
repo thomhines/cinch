@@ -1,4 +1,4 @@
-Cinch 0.6
+Cinch 0.8
 =========
 
 A simple, streamlined way to combine, compress, and cache web files.
@@ -12,19 +12,20 @@ Cinch allows developers to automatically handle JS/CSS compression and concateni
 
 Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files, and if it finds any it will quickly build a static cache file to send to your users.
 
-
+For more up-to-date details, check out the [cinch website](http://projects.thomhines.com/cinch/).
 
 #### Features:
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
 - Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
-- Built-in access to tons of common libraries, such as jQuery, Prototype, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/), [960.gs](http://960.gs/), and [Bourbon](http://bourbon.io/), and a variety of javascript plugins. See the entire list below.
-- Adds CSS vendor prefixes automatically, along with a bunch of CSS enhancements
+- Built-in access to tons of common libraries, frameworks and software packages, such as jQuery, Angular, Bootstrap, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/), [960.gs](http://960.gs/), and 
+- Live Reload refreshes styles and scripts in your browser automatically when changes are detected to your web files
 - Combines multiple files into one file to reduce HTTP connections between the server and your users
 - Caches files on server if no new changes have been detected to the source files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
 - Uses gzip to further compress output files when available
-
+- Adds CSS vendor prefixes automatically, along with a bunch of CSS enhancements
+- [Bourbon](http://bourbon.io/) mixins added to any Sass files automatically
 
 
 Basic usage
@@ -71,59 +72,34 @@ In order to use any of the setting below, just add them to the query string in t
 
 	Example: `?files=!/js/plugin.min.js,!/js/scripts.js`
 
-- **[library-name/version]** - To include an external library from the list below, enclose the name of the library and the version number(optional) in a pair of square brackets, separated by a forward slash (/). If no version is given, the latest version of the libary will be used (as of when this was last updated).
+- **[bower-package-name(/version)]** - To include an external library from the list below, enclose the name of the library and the version number(optional) in a pair of square brackets, separated by a forward slash (/). If no version is given, the latest version of the libary will be used.
 
 	Example: `?files=[jquery]` or `?files=[jquery/1.10.2]`
 
-	Available libraries are (default version is in paratheses):
-	
-	**[960gs](https://raw.github.com/nathansmith/960-Grid-System/master/code/css/960.css)** (1.0),
-	**[angular](https://ajax.googleapis.com/ajax/libs/angularjs/1.2.4/angular.min.js)** (1.2.4),
-	**[bootstrap-css](http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css)** (3.0.3),
-	**[bootstrap-theme-css](http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css)** (3.0.3),
-	**[bootstrap-js](http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js)** (3.0.3),
-	**[chrome-frame](https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js)** (1.0.3),
-	**[cssreset](libraries/reset/2.0/reset.css)** (2.0),
-	**[cycle2](http://malsup.github.io/min/jquery.cycle2.min.js)** (20131022),
-	**[dojo](https://ajax.googleapis.com/ajax/libs/dojo/1.9.1/dojo/dojo.js)** (1.9.1),
-	**[ext-core](https://ajax.googleapis.com/ajax/libs/ext-core/3.1.0/ext-core.js)** (3.1.0),
-	**[foldy960](https://raw.github.com/davatron5000/Foldy960/master/style.css)** (1.0),
-	**[foundation-css](libraries/foundation/5.0.2/foundation.min.css)** (5.0.2),
-	**[foundation-js](libraries/foundation/5.0.2/foundation.min.js)** (5.0.2),
-	**[html5shiv](http://html5shiv.googlecode.com/svn/trunk/html5.js)** (3.7.0),
-	**[isotope-css](https://raw.github.com/desandro/isotope/master/css/style.css)** (1.2.25),
-	**[isotope-js](https://raw.github.com/desandro/isotope/master/jquery.isotope.min.js)** (1.2.25),
-	**[jquery](https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js)** (1.10.2),
-	**[jqueryui](https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js)** (1.10.3),
-	**[kube](http://imperavi.com/css/kube.css)** (2.0.0),
-	**[masonry](http://masonry.desandro.com/masonry.pkgd.min.js)** (3.1.3),
-	**[modernizr](http://modernizr.com/downloads/modernizr-latest.js)** (2.7.1),
-	**[mootools](https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js)** (1.4.5),
-	**[normalize](http://necolas.github.io/normalize.css/2.1.3/normalize.css)** (2.1.3),
-	**[prototype](https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js)** (1.7.1.0),
-	**[pure](http://yui.yahooapis.com/pure/0.3.0/pure-min.css)** (0.3.0),
-	**[scriptaculous](https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js)** (1.9.0),
-	**[swfobject](https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js)** (2.2),
-	**[webfont](https://ajax.googleapis.com/ajax/libs/webfont/1.5.0/webfont.js)** (1.5.0),
-	**[yui-reset](http://yui.yahooapis.com/3.14.0/build/cssreset/cssreset-min.css)** (3.14.0)
+	A full list of Bower packages can be found on the [Bower](http://bower.io/search/) website.
 	
 
 
 #### OPTIONAL SETTINGS
 *Values marked with a star are the default and will be used if no value is given.*
 		
-- **t=(js|css|auto*)** - Indicate which type of files are being sent to Cinch
+- **type=( js | css | auto* )** - Indicate which type of files are being sent to Cinch
 	- **js**: Process files as javascript
 	- **css**: Process files as CSS
 	- **auto***: Cinch will do it's best to automatically detect which type of files are being used. This is based on the extension of the first file in the list.
 	
-- **force=(true|false*)** - Force Cinch to rebuild the cache and update the user's browser with the newest code on every page load, even if no changes have been detected.
+- **force=( true | false* )** - Force Cinch to rebuild the cache and update the user's browser with the newest code on every page load, even if no changes have been detected.
 
-- **min=(true*|false)** - Enable/disable minification on files. 
-	- NOTE: Files will still be concatenated and cached.
+- **min=( true* | false | pack )** - Enable/disable minification on files. 
 	- NOTE: Files marked with a '!' in order to avoid minification will no be minified regardless of this setting's value.
+	- NOTE: The 'pack' setting minifies *and* obfuscates files. This setting applies only to javascript files. Standard minification will be applied to CSS files if this setting is used.
 	
-- **debug=(true*|false)** - When enabled, output files display errors. Otherwise, errors are ignored.
+- **debug=( true* | false )** - When enabled, output files display errors. Otherwise, errors are ignored.
+
+
+- reload=( true | false ) - Automatically checks for changes to your web files and reloads those files if a new version is found.
+	- NOTE: Since this setting is javascript-based, live reloading requires that cinch process at least one link to javascript.
+	- NOTE: This setting can only be enabled on a javascript link, not CSS.
 
 
 ### Requirements
@@ -134,17 +110,27 @@ In order to use any of the setting below, just add them to the query string in t
 - **PHP 5.3+** - CoffeeScript Compiler
 
 
+### FAQs
+
+- **Cinch isn't working. Why is that?**
+	There could be a lot of things causing cinch not to run properly on your site: invalid links to cinch or your web files, errors in your code, etc. If you're getting a 404 error on your cinch links, then make sure cinch is properly loaded on your server and your links are correct. If your site is loading cinch, then you can check the top of the output files to see if cinch ran into any bugs or errors. Debug output in cinch is enabled by default.
+
+- **How do I upgrade to a newer version of cinch?**
+	Just overwrite the cinch folder with the new version! All of your dependencies will be automatically re-downloaded and all of your cache files will be rebuilt the next time you visit your page. After you've rebuilt your cache files, don't forget to set the 'PRODUCTION' constant at the top of the cinch/cinch.php file if you want to protect your cache folder.
+
+- **How do I link to a package that has both CSS and JS files?**
+	In cases, like Bootstrap, that have both CSS and javascript components, just include the package in both your CSS and JS links. Cinch will automatically separate the files into the correct types. If cinch isn't properly detecting which file type you are trying to use, add the type=css or type=js property to your file link.
+
+- **I have so many cache files!**
+	Don't worry! This happens a lot as part of the development process. You can delete all of the files in your /cinch/cache folder and cinch will rebuild all of your cache files automatically. Or just wait a month and cinch's automatic clean-up scripts will delete old cache files.
+
 
 ### Other Notes and Goodies
 
-- [Bourbon](http://bourbon.io/) and [Bourbon Neat](http://neat.bourbon.io/) mixins libraries have been packaged with cinch, and can be added by using an '@import' inside your Sass files, like so:
-	
-	<code>@import 'path/to/cinch/libraries/bourbon/bourbon';</code>
-	
-	<code>@import 'path/to/cinch/libraries/neat/neat';</code>
-
+- If you want to speed up performance and prevent new cache files from being created on your server, simply set the PRODUCTION constant in cinch/cinch.php to TRUE. Production mode bypasses most of cinch's code to serve up the cached web files as quickly as possible. NOTE: New changes to any of the raw web files will not be reflected in the cache files.
+- The [Bourbon](http://bourbon.io/) mixins library has been packaged with cinch, and will automatically be imported into your Sass files on execution. If you don't need them, no problem; the only extra bulk it will add to your stylesheets will be based on which mixins you use.
+- CSS vendor prefixes are added automatically, along with smart CSS minification, color conversions, and more, thanks to [Javier Marín's](https://github.com/javiermarinros) css_optimizer. No need to write 5 lines of CSS to accommodate each browser anymore.
 - A separate cache file is created for each combination of JS/CSS files that you use, so that different pages with different requirements can still run as quickly as possible. In order to prevent this folder from being overloaded on a busy development server, the cache is automatically cleared about once a month.
-
 
 
 
