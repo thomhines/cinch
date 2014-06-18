@@ -11,7 +11,7 @@ $defaults = array (
 	'min' => true,
 	'force' => false,
 	'debug' => true,
-	'reload' => true,
+	'reload' => false,
 	'type' => 'auto'
 );
 
@@ -49,11 +49,6 @@ function cinchMain($_settings) {
 	// Set Default Settings
 	$settings = setDefaultsSettings($_settings);
 	
-	if(PRODUCTION) {
-		$settings['force'] = 0;
-		$settings['reload'] = 0;
-	}
-	
 	if($settings['type'] == 'js') {
 		unset($file_array['css']);
 		header("Content-type: application/x-javascript; charset: UTF-8"); 
@@ -66,58 +61,60 @@ function cinchMain($_settings) {
 	// Separate files into CSS and JS lists
 	sortFiles($settings['files']);
 	
+	// See if cache file exists and is current
+	$cachefile = 'cache/'.md5(implode(",", $file_array[$settings['type']])) . "." .$settings['type'];
+	
+	if(PRODUCTION) {
+		printCacheFile($cachefile);
+		exit;
+	}
 	
 	
 	
-	//foreach($file_array as $file_type => $type_file_array) {
+	$cachefile_timestamp = hasCacheFile($cachefile, $file_array[$settings['type']]);
+	$gmt_mtime = gmdate('r', $cachefile_timestamp);
+	session_cache_limiter(‘public’);
+	header('ETag: "'.md5($cachefile_timestamp.$cachefile).'"');
+	header('Last-Modified: '.$gmt_mtime);
+	header('Cache-Control: public');
+	// If user has file cached in browser, send 304 Not Modified Header
+	if (!$settings['force'] && $cachefile_timestamp && ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == md5($cachefile_timestamp.$cachefile))) {
+		header('HTTP/1.1 304 Not Modified');	
+		exit();
+	}
+	
+	// Load Live Reload
+	if($settings['type'] == 'js' && $settings['reload']) $file_array[$settings['type']][] = "!".CINCH_REL_PATH."libraries/live.min.js";
+	
+	// If cache file exists on server and is current, but user doesn't have it yet, send that.
+	if(($cachefile_timestamp && !$settings['force'])) {
+		//printCacheLink($cachefile, $file_type);
+		printCacheFile($cachefile);
+	} 
 
-		// See if cache file exists and is current
-		$cachefile = 'cache/'.md5(implode(",", $file_array[$settings['type']])) . "." .$settings['type'];
-		$cachefile_timestamp = hasCacheFile($cachefile, $file_array[$settings['type']]);
-		$gmt_mtime = gmdate('r', $cachefile_timestamp);
-		session_cache_limiter(‘public’);
-		header('ETag: "'.md5($cachefile_timestamp.$cachefile).'"');
-		header('Last-Modified: '.$gmt_mtime);
-		header('Cache-Control: public');
-		// If user has file cached in browser, send 304 Not Modified Header
-		if (!$settings['force'] && $cachefile_timestamp && ($_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime || str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == md5($cachefile_timestamp.$cachefile))) {
-			header('HTTP/1.1 304 Not Modified');	
-			exit();
-		}
+	// Else, build new cache files, CSS then JS
+	else if(count($file_array[$settings['type']])) {
+		// Process all files of this type (external libraries, preprocessors, minification, etc.)
+		$file_output = processFileList($file_array[$settings['type']]);
 		
-		// Load Live Reload
-		if($settings['type'] == 'js' && $settings['reload']) $file_array[$settings['type']][] = "!".CINCH_REL_PATH."libraries/live.min.js";
-		
-		// If cache file exists on server and is current, but user doesn't have it yet, send that.
-		if(($cachefile_timestamp && !$settings['force']) || PRODUCTION) {
-			//printCacheLink($cachefile, $file_type);
-			printCacheFile($cachefile);
-		} 
-	
-		// Else, build new cache files, CSS then JS
-		else if(count($file_array[$settings['type']])) {
-			// Process all files of this type (external libraries, preprocessors, minification, etc.)
-			$file_output = processFileList($file_array[$settings['type']]);
-			
-			// Add error messages to output
-			if($settings['debug'] && $error) $file_output = "/*\n\nERROR:\n$error\n*/\n\n" . $file_output; 
+		// Add error messages to output
+		if($settings['debug'] && $error) $file_output = "/*\n\nERROR:\n$error\n*/\n\n" . $file_output; 
 
-			// Save output to cache file
-			if($handle = fopen($cachefile, 'w')) {
-				if(fwrite($handle, $file_output) === FALSE) {
-					echo "Cannot write to cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
-				}
+		// Save output to cache file
+		if($handle = fopen($cachefile, 'w')) {
+			if(fwrite($handle, $file_output) === FALSE) {
+				echo "Cannot write to cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
 			}
-			else echo "Cannot open cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
-			if($handle) fclose($handle);
-			
-			// Print output
-			//printCacheLink($cachefile, $file_type);
-			printCacheFile($cachefile);
-
-			
 		}
-	//}
+		else echo "Cannot open cache file: '".$cachefile."'. Make sure the permissions on your server are set to allow write access to the 'cache' folder.\n";
+		if($handle) fclose($handle);
+		
+		// Print output
+		//printCacheLink($cachefile, $file_type);
+		printCacheFile($cachefile);
+
+		
+	}
 }
 
 
