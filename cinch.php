@@ -1,19 +1,6 @@
 <?php
 
-// Set this value to true to prevent any new cache files from being created.
-// This essentially locks down cinch and keeps unauthorized code from
-// being generated on the server
-define('PRODUCTION', false);
-
-
-// Defaults for cinch settings can be set here
-$defaults = array (
-	'min' => true,
-	'force' => false,
-	'debug' => true,
-	'reload' => false,
-	'type' => 'auto'
-);
+require_once('config.php');
 
 
 
