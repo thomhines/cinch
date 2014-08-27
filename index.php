@@ -17,7 +17,8 @@ require_once('cinch.php');
 
 
 if($_GET) {
-	cinchMain(array(
+	$cinch = new cinch;
+	$cinch->run(array(
 		files => explode(",", $_GET['files']),
 		type => $_GET['type'],
 		min => $_GET['min'],
