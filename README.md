@@ -1,4 +1,4 @@
-Cinch 0.8
+Cinch 0.9
 =========
 
 A simple, streamlined way to combine, compress, and cache web files.
@@ -12,20 +12,23 @@ Cinch allows developers to automatically handle JS/CSS compression and concateni
 
 Furthermore, it's perfect for both development and production environments. Cinch will look for new changes to your JS/CSS files, and if it finds any it will quickly build a static cache file to send to your users.
 
-For more up-to-date details, check out the [cinch website](http://projects.thomhines.com/cinch/).
+
+##### For more up-to-date details, check out the [cinch website](http://projects.thomhines.com/cinch/).
 
 #### Features:
 
 - Automatic minification of JS/CSS, which removes unnecessary spaces and comments
 - Converts common pre-processor formats (LESS, SCSS, SASS, and CoffeeScript) into standard CSS/JS automatically
-- Built-in access to tons of common libraries, frameworks and software packages, such as jQuery, Angular, Bootstrap, and more in [Google Hosted Libraries](https://developers.google.com/speed/libraries/), CSS frameworks such as [Foundation](http://foundation.zurb.com/), [960.gs](http://960.gs/), and 
-- Live Reload refreshes styles and scripts in your browser automatically when changes are detected to your web files
 - Combines multiple files into one file to reduce HTTP connections between the server and your users
 - Caches files on server if no new changes have been detected to the source files
+- Built-in access to tons of common libraries, frameworks and software packages, such as jQuery, Angular, Bootstrap, and more available through the [Bower](http://bower.io/) package manager.
+- Live Reload refreshes styles and scripts in your browser automatically when changes are detected to your web files
 - Serves '304 Not Mofidified' headers to users if the user already has the latest code in the browser's cache
 - Uses gzip to further compress output files when available
 - Adds CSS vendor prefixes automatically, along with a bunch of CSS enhancements
-- [Bourbon](http://bourbon.io/) mixins added to any Sass files automatically
+- [Bourbon](http://bourbon.io/) mixins included and automatically added to any Sass files
+
+
 
 
 Basic usage

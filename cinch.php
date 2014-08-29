@@ -1,5 +1,18 @@
 <?php
 
+/*----------------------------------------------------------------------*
+
+	cinch
+	https://github.com/thomhines/cinch
+	
+	A simple, streamlined plugin to minimize and cache JS/CSS files
+
+	Copyright 2013, Thom Hines
+	MIT License
+	
+*----------------------------------------------------------------------*/
+
+
 require_once('config.php');
 
 // Set constants and global variables
@@ -280,16 +293,16 @@ class cinch {
 		if($compress_file && $file_type == 'js'){	// Javascript		
 	
 			if($compress_file === 'pack') {
-				require_once('processors/packer-1.1/class.JavaScriptPacker.php');
+				require_once('libraries/packer-1.1/class.JavaScriptPacker.php');
 				$packer = new JavaScriptPacker($temp_content, 'Normal', true, false);
 				$temp_content = $packer->pack();
 			} else {
-				require_once('processors/jsShrink.php');
+				require_once('libraries/jsShrink.php');
 				$temp_content = jsShrink($temp_content);
 			
 			}
 		} elseif($compress_file) { //CSS
-			require_once('processors/css_optimizer/css_optimizer.php');
+			require_once('libraries/css_optimizer/css_optimizer.php');
 			$css_optimizer = new css_optimizer();
 			$temp_content = $css_optimizer->process($temp_content);
 			$temp_content = $this->minifyCSS($temp_content);
@@ -561,12 +574,12 @@ class cinch {
 		// CHECK TO SEE IF FILE USES OLD SCHOOL INDENTATION STYLE
 		if(strpos($src, "{") === false) {
 			// IF SO, CONVERT IT TO SCSS
-			require_once('processors/sass.php');
+			require_once('libraries/sass.php');
 			$src = sassToScss($src);
 		} 
 		
 		
-		require_once('processors/scss/scss.inc.php');
+		require_once('libraries/scss/scss.inc.php');
 		$scss = new scssc();
 		$scss->addImportPath($path);
 		
@@ -590,7 +603,7 @@ class cinch {
 	function convertLESS($src, $file) {
 		
 		$path = "../".dirname($file)."/";
-		require_once('processors/less/lessc.inc.php');
+		require_once('libraries/less/lessc.inc.php');
 		$less = new lessc();
 		$less->addImportDir($path);
 		try {
@@ -616,7 +629,7 @@ class cinch {
 	
 	// Parses coffeescript files
 	function convertCoffee($src) {
-		if (version_compare(PHP_VERSION, '5.3.0') >= 0) require_once('processors/coffeescript/Init.php');
+		if (version_compare(PHP_VERSION, '5.3.0') >= 0) require_once('libraries/coffeescript/Init.php');
 		else $this->recordError("The coffeescript processor requires PHP 5.3 or greater, which you don't have. All .coffee files are currently being skipped.");
 	}
 	

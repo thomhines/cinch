@@ -2,7 +2,7 @@
 
 /*----------------------------------------------------------------------*
 
-	Cinch
+	cinch
 	https://github.com/thomhines/cinch
 	
 	A simple, streamlined plugin to minimize and cache JS/CSS files
