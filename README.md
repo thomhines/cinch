@@ -1,4 +1,4 @@
-Cinch 0.9
+Cinch 0.8
 =========
 
 A simple, streamlined way to combine, compress, and cache web files.
